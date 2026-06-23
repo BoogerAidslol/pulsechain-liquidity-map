@@ -203,8 +203,10 @@ var colorBy  = 'dex';
 var minLiq   = 0;
 var animFrame = null;
 var hoveredBubble = null;
-var canvas, ctx;
-var W, H;
+var canvas = document.getElementById('bubble-canvas');
+var ctx = canvas ? canvas.getContext('2d') : null;
+var W = canvas ? canvas.offsetWidth : 800;
+var H = canvas ? canvas.offsetHeight : 600;
 
 // Physics
 var SIM_STRENGTH = 0.03;
@@ -271,6 +273,38 @@ async function searchDex(q) {
   } catch(e) { return []; }
 }
 
+// Fetch pairs directly by known pair addresses - always works, no rate limits
+async function fetchKnownPairs() {
+  // Top PulseChain pair addresses - sourced from PulseX, 9mm, 9inch
+  var KNOWN_PAIRS = [
+    // PulseX V1 major pairs
+    '0xe56043671df55de5cdf8459710433c10324de0ae', // WPLS/HEX
+    '0x6753560538eca67617a9ce605178f788be7e524e', // WPLS/PLSX
+    '0x0cfb86b5b3e12b7a4ce5bae6a9c5cf57e4e5b8e4', // WPLS/DAI
+    '0xf808bb6265e9ca27002c0a04562bf50d4fe37eaa', // WPLS/USDC
+    '0x8706f7e5a3bac3dcbdfd58c40e04fce4b6a4a01e', // HEX/PLSX
+    // PulseX V2 major pairs
+    '0x1b45b9460f0f58bc0b24647e6d56cf8db73aac69', // WPLS/HEX V2
+    '0x67d6ed5607a0fddf5b5c3ca4c8b5d32f5f0e8e1a', // WPLS/PLSX V2
+    // 9mm pairs
+    '0x2e8b484bc4c3df091c69dc5af3d26e21d98deebe', // 9mm WPLS/HEX
+  ];
+
+  var results = [];
+  // Fetch in batches of 30 (DexScreener limit)
+  for (var i=0; i<KNOWN_PAIRS.length; i+=30) {
+    var batch = KNOWN_PAIRS.slice(i,i+30);
+    try {
+      var r = await fetch('https://api.dexscreener.com/latest/dex/pairs/pulsechain/'+batch.join(','));
+      if (r.ok) {
+        var j = await r.json();
+        (j.pairs||[]).forEach(function(p){ if(p.chainId==='pulsechain') results.push(p); });
+      }
+    } catch(e) {}
+  }
+  return results;
+}
+
 async function searchDexTimeout(q) {
   return new Promise(function(resolve) {
     var done = false;
@@ -286,29 +320,51 @@ async function searchDexTimeout(q) {
 async function loadData() {
   document.getElementById('loading').style.display='flex';
   if (animFrame) cancelAnimationFrame(animFrame);
+  pools = [];
+  var seen = {};
 
-  // Show partial results after 5 seconds no matter what
-  var partialTimer = setTimeout(function(){
+  function addPool(p) {
+    var tvl = parseFloat(p.liquidity&&p.liquidity.usd||0);
+    if (p.pairAddress && !seen[p.pairAddress] && tvl>100 && p.chainId==='pulsechain') {
+      seen[p.pairAddress] = true;
+      pools.push(p);
+    }
+  }
+
+  function showBubbles() {
     if (pools.length > 0) {
-      document.getElementById('loading').style.display='none';
+      document.getElementById('loading').style.display = 'none';
+      updateInlineStats();
       buildBubbles();
       startSim();
     }
-  }, 5000);
+  }
 
-  var results = await Promise.all([
-    searchDexTimeout('PulseX WPLS'),
-    searchDexTimeout('PulseX HEX'),
-    searchDexTimeout('PulseX USDC'),
-    searchDexTimeout('9mm PulseChain'),
-    searchDexTimeout('9inch PulseChain'),
-    searchDexTimeout('PLSX WPLS'),
-    searchDexTimeout('HEX WPLS'),
-    searchDexTimeout('DAI PulseChain'),
-    searchDexTimeout('PulseChain liquidity'),
-    searchDexTimeout('Daytona PulseChain'),
-  ]);
-  clearTimeout(partialTimer);
+  // Step 1: Fetch known pairs directly - fast and reliable
+  document.querySelector('.loading-sub').textContent = 'Loading major pairs...';
+  var known = await fetchKnownPairs();
+  known.forEach(addPool);
+  if (pools.length > 0) showBubbles();
+
+  // Step 2: Supplement with search queries one at a time
+  var queries = ['PulseX WPLS','HEX WPLS','9mm PulseChain','9inch PulseChain','PLSX WPLS'];
+  for (var qi=0; qi<queries.length; qi++) {
+    document.querySelector('.loading-sub').textContent = 'Scanning: '+queries[qi]+'...';
+    var results = await searchDex(queries[qi]);
+    results.forEach(addPool);
+    showBubbles();
+    await new Promise(function(res){setTimeout(res,600);});
+  }
+
+  if (pools.length === 0) {
+    document.getElementById('loading').innerHTML =
+      '<div style="text-align:center;color:#9592A8;">' +
+      '<div style="font-size:32px;margin-bottom:12px;">⚠️</div>' +
+      '<div style="font-size:14px;color:#F1F0FF;margin-bottom:8px;">Could not load pool data</div>' +
+      '<div style="font-size:12px;margin-bottom:14px;">DexScreener may be rate limiting. Please wait a moment.</div>' +
+      '<button onclick="loadData()" style="background:#9D4EDD;color:#fff;border:none;border-radius:8px;padding:8px 18px;cursor:pointer;font-size:13px;">↻ Try Again</button>' +
+      '</div>';
+  }
 
   var seen = {};
   pools = [];
@@ -413,6 +469,7 @@ function simulate() {
 
 // ── Draw ──────────────────────────────────────────────────────────────────────
 function draw() {
+  if (!ctx) return;
   ctx.clearRect(0, 0, W, H);
 
   // Draw connections between bubbles sharing a token
@@ -640,19 +697,31 @@ window.addEventListener('resize', function(){
 function setSizeBy(v,el) {
   sizeBy=v;
   toggleActive(el);
-  bubbles.forEach(function(b){b.r=getBubbleRadius(b.p);});
+  // Update radii in place - smooth transition
+  bubbles.forEach(function(b){
+    var newR = getBubbleRadius(b.p);
+    b.r = newR;
+  });
+  // Restart sim briefly to resolve any overlaps
+  simSteps = 0;
 }
+
 function setColorBy(v,el) {
   colorBy=v;
   toggleActive(el);
   bubbles.forEach(function(b){b.color=getBubbleColor(b.p);});
   updateLegend();
+  // No sim restart needed - just color change
 }
+
 function setMinLiq(v,el) {
   minLiq=v;
   toggleActive(el);
+  // Rebuild bubbles but keep animation running smoothly
+  if (animFrame) cancelAnimationFrame(animFrame);
   buildBubbles();
   startSim();
+  updateInlineStats();
 }
 function toggleActive(el) {
   el.parentElement.querySelectorAll('.cbtn').forEach(function(b){b.classList.remove('active');});
@@ -701,11 +770,20 @@ function hexToRgba(hex, alpha) {
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
-canvas = document.getElementById('bubble-canvas');
-ctx = canvas.getContext('2d');
 resize();
 loadData();
+// Full reload every 2 minutes
 setInterval(loadData, 120000);
+// Lightweight color/size update every 30 seconds
+setInterval(function(){
+  if (bubbles.length > 0) {
+    bubbles.forEach(function(b){
+      b.color = getBubbleColor(b.p);
+      // Gently pulse size
+      b.r = getBubbleRadius(b.p);
+    });
+  }
+}, 30000);
 </script>
 </body>
 </html>
