@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PulseChain Liquidity Map</title>
+<style>
+:root{--pulse:#9D4EDD;--green:#22C55E;--red:#EF4444;--amber:#F59E0B;--blue:#3B82F6;--bg:#0A0A0F;--bg2:#111118;--bg3:#18181F;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);--text:#F1F0FF;--muted:#6B6880;--sub:#9592A8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+header{border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:rgba(10,10,15,0.97);z-index:10;}
+.logo{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:600;}
+.logo-icon{width:27px;height:27px;background:linear-gradient(135deg,#9D4EDD,#6B21A8);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;}
+.hright{display:flex;align-items:center;gap:10px;}
+.live-badge{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--green);font-family:'Courier New',monospace;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.btn{background:var(--bg2);border:1px solid var(--border2);color:var(--sub);border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;font-family:inherit;}
+.btn:hover{border-color:var(--pulse);color:var(--text);}
+
+/* Controls bar */
+.controls{padding:10px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg2);}
+.ctrl-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;}
+.cbtn{background:var(--bg3);border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:4px 11px;font-size:11px;cursor:pointer;font-family:inherit;}
+.cbtn:hover{border-color:var(--border2);color:var(--sub);}
+.cbtn.active{background:rgba(157,78,221,0.1);border-color:var(--pulse);color:var(--pulse);}
+.stats-inline{display:flex;gap:16px;margin-left:auto;}
+.si{font-size:11px;color:var(--muted);}
+.si span{color:var(--text);font-weight:600;font-family:'Courier New',monospace;}
+
+/* Canvas area */
+.canvas-wrap{flex:1;position:relative;overflow:hidden;}
+#bubble-canvas{width:100%;height:100%;}
+
+/* Tooltip */
+.tooltip{position:absolute;background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:14px 16px;pointer-events:none;display:none;z-index:100;min-width:220px;box-shadow:0 8px 24px rgba(0,0,0,0.4);}
+.tt-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.tt-icon{width:28px;height:28px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--sub);overflow:hidden;flex-shrink:0;}
+.tt-icon img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.tt-name{font-size:13px;font-weight:600;}
+.tt-dex{font-size:10px;color:var(--muted);font-family:'Courier New',monospace;}
+.tt-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.tt-stat-lbl{font-size:10px;color:var(--muted);margin-bottom:2px;}
+.tt-stat-val{font-size:13px;font-weight:600;font-family:'Courier New',monospace;}
+.tt-stat-val.green{color:var(--green);}
+.tt-stat-val.red{color:var(--red);}
+.tt-stat-val.amber{color:var(--amber);}
+.tt-footer{margin-top:10px;padding-top:8px;border-top:1px solid var(--border);display:flex;gap:8px;}
+.tt-link{font-size:11px;color:var(--pulse);text-decoration:none;opacity:0.8;}
+.tt-link:hover{opacity:1;}
+
+/* Legend */
+.legend{position:absolute;bottom:20px;left:20px;background:rgba(17,17,24,0.9);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:11px;}
+.legend-title{color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px;font-size:10px;}
+.legend-item{display:flex;align-items:center;gap:7px;margin-bottom:5px;color:var(--sub);}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.legend-size{display:flex;align-items:center;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
+.ls-circle{border-radius:50%;background:rgba(157,78,221,0.3);border:1px solid rgba(157,78,221,0.5);flex-shrink:0;}
+
+/* Loading overlay */
+.loading-overlay{position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:50;}
+.spinner{width:28px;height:28px;border:2px solid var(--border2);border-top-color:var(--pulse);border-radius:50%;animation:spin 0.75s linear infinite;margin-bottom:14px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-text{font-size:14px;color:var(--sub);margin-bottom:6px;}
+.loading-sub{font-size:12px;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><div class="logo-icon">🫧</div> PulseChain Liquidity Map</div>
+  <div class="hright">
+    <div class="live-badge"><div class="live-dot"></div> LIVE</div>
+    <button class="btn" onclick="loadData()">↻ Refresh</button>
+  </div>
+</header>
+
+<div class="controls">
+  <span class="ctrl-label">Size by:</span>
+  <button class="cbtn active" onclick="setSizeBy('tvl',this)">TVL</button>
+  <button class="cbtn" onclick="setSizeBy('volume',this)">Volume</button>
+  <button class="cbtn" onclick="setSizeBy('apr',this)">APR</button>
+
+  <span class="ctrl-label" style="margin-left:8px;">Color by:</span>
+  <button class="cbtn active" onclick="setColorBy('dex',this)">DEX</button>
+  <button class="cbtn" onclick="setColorBy('change',this)">24h Change</button>
+  <button class="cbtn" onclick="setColorBy('apr',this)">APR</button>
+
+  <span class="ctrl-label" style="margin-left:8px;">Show:</span>
+  <button class="cbtn active" onclick="setMinLiq(0,this)">All</button>
+  <button class="cbtn" onclick="setMinLiq(10000,this)">$10K+</button>
+  <button class="cbtn" onclick="setMinLiq(100000,this)">$100K+</button>
+  <button class="cbtn" onclick="setMinLiq(1000000,this)">$1M+</button>
+
+  <div class="stats-inline">
+    <div class="si">Pools: <span id="si-pools">—</span></div>
+    <div class="si">Total TVL: <span id="si-tvl">—</span></div>
+    <div class="si">Vol 24h: <span id="si-vol">—</span></div>
+  </div>
+</div>
+
+<div class="canvas-wrap">
+  <canvas id="bubble-canvas"></canvas>
+
+  <!-- Loading overlay -->
+  <div class="loading-overlay" id="loading">
+    <div class="spinner"></div>
+    <div class="loading-text">Loading PulseChain liquidity data...</div>
+    <div class="loading-sub">Fetching pools from all DEXs</div>
+  </div>
+
+  <!-- Tooltip -->
+  <div class="tooltip" id="tooltip">
+    <div class="tt-header">
+      <div class="tt-icon" id="tt-icon"></div>
+      <div>
+        <div class="tt-name" id="tt-name"></div>
+        <div class="tt-dex" id="tt-dex"></div>
+      </div>
+    </div>
+    <div class="tt-stats">
+      <div><div class="tt-stat-lbl">TVL</div><div class="tt-stat-val" id="tt-tvl"></div></div>
+      <div><div class="tt-stat-lbl">Vol 24h</div><div class="tt-stat-val" id="tt-vol"></div></div>
+      <div><div class="tt-stat-lbl">Est. APR</div><div class="tt-stat-val amber" id="tt-apr"></div></div>
+      <div><div class="tt-stat-lbl">24h Change</div><div class="tt-stat-val" id="tt-chg"></div></div>
+    </div>
+    <div class="tt-footer">
+      <a class="tt-link" id="tt-dex-link" href="#" target="_blank">Add Liquidity ↗</a>
+      <a class="tt-link" id="tt-chart-link" href="#" target="_blank">Chart ↗</a>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend" id="legend">
+    <div class="legend-title">DEX</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#3B82F6;"></div>PulseX V1</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#9D4EDD;"></div>PulseX V2</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#F59E0B;"></div>9mm</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#EF4444;"></div>9inch</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#22C55E;"></div>Other</div>
+    <div class="legend-size">
+      <div class="ls-circle" style="width:10px;height:10px;"></div>
+      <span style="color:var(--muted);font-size:10px;">= $10K TVL</span>
+      <div class="ls-circle" style="width:20px;height:20px;margin-left:8px;"></div>
+      <span style="color:var(--muted);font-size:10px;">= $1M TVL</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Config ────────────────────────────────────────────────────────────────────
+var DEXSCR = 'https://api.dexscreener.com/latest/dex';
+
+var DEX_COLORS = {
+  pulsex:    '#3B82F6',
+  pulsex_v2: '#9D4EDD',
+  pulsexss:  '#6366F1',
+  '9mm':     '#F59E0B',
+  '9mmv3':   '#D97706',
+  '9inch':   '#EF4444',
+  daytona:   '#22C55E',
+  default:   '#6B6880'
+};
+
+var DEX_LABELS = {
+  pulsex:    'PulseX V1',
+  pulsex_v2: 'PulseX V2',
+  pulsexss:  'PulseX Stable',
+  '9mm':     '9mm V2',
+  '9mmv3':   '9mm V3',
+  '9inch':   '9inch',
+  daytona:   'Daytona',
+  default:   'Other DEX'
+};
+
+var DEX_ADD_URLS = {
+  pulsex:    'https://app.pulsex.com/add/',
+  pulsex_v2: 'https://app.pulsex.com/add/',
+  '9mm':     'https://9mm.pro/add/',
+  '9inch':   'https://9inch.io/#/add/',
+  default:   'https://dexscreener.com/pulsechain/'
+};
+
+function getDexKey(dexId) {
+  if (!dexId) return 'default';
+  var d = dexId.toLowerCase();
+  if (d.includes('pulsexss')||d.includes('stable')) return 'pulsexss';
+  if (d.includes('pulsex_v2')||d.includes('pulsexv2')) return 'pulsex_v2';
+  if (d.includes('pulsex')) return 'pulsex';
+  if (d.includes('9mmv3')||d.includes('9mm-v3')) return '9mmv3';
+  if (d.includes('9mm')) return '9mm';
+  if (d.includes('9inch')) return '9inch';
+  if (d.includes('daytona')) return 'daytona';
+  return 'default';
+}
+
+// ── State ─────────────────────────────────────────────────────────────────────
+var pools = [];
+var bubbles = [];
+var sizeBy   = 'tvl';
+var colorBy  = 'dex';
+var minLiq   = 0;
+var animFrame = null;
+var hoveredBubble = null;
+var canvas, ctx;
+var W, H;
+
+// Physics
+var SIM_STRENGTH = 0.03;
+var COLLIDE_STRENGTH = 0.8;
+var CENTER_STRENGTH = 0.02;
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function fmt(v) {
+  if (!v||isNaN(v)) return '$0';
+  if (v>=1e9) return '$'+(v/1e9).toFixed(2)+'B';
+  if (v>=1e6) return '$'+(v/1e6).toFixed(2)+'M';
+  if (v>=1000) return '$'+(v/1000).toFixed(1)+'K';
+  return '$'+v.toFixed(0);
+}
+
+function calcAPR(p) {
+  var vol = parseFloat(p.volume&&p.volume.h24||0);
+  var tvl = parseFloat(p.liquidity&&p.liquidity.usd||0);
+  if (!tvl||!vol) return 0;
+  return Math.min((vol*0.003/tvl)*365*100, 99999);
+}
+
+function getBubbleColor(p) {
+  if (colorBy==='dex') {
+    var k = getDexKey(p.dexId);
+    return DEX_COLORS[k]||DEX_COLORS.default;
+  }
+  if (colorBy==='change') {
+    var ch = parseFloat(p.priceChange&&p.priceChange.h24||0);
+    if (ch>10) return '#22C55E';
+    if (ch>0)  return '#86EFAC';
+    if (ch>-10)return '#FCA5A5';
+    return '#EF4444';
+  }
+  if (colorBy==='apr') {
+    var apr = calcAPR(p);
+    if (apr>100) return '#22C55E';
+    if (apr>50)  return '#86EFAC';
+    if (apr>20)  return '#FCD34D';
+    if (apr>5)   return '#F59E0B';
+    return '#6B6880';
+  }
+  return DEX_COLORS.default;
+}
+
+function getBubbleRadius(p) {
+  var val;
+  if (sizeBy==='tvl')    val = parseFloat(p.liquidity&&p.liquidity.usd||0);
+  if (sizeBy==='volume') val = parseFloat(p.volume&&p.volume.h24||0);
+  if (sizeBy==='apr')    val = calcAPR(p);
+  if (!val||val<=0) return 8;
+  // Log scale for radius
+  var r = Math.sqrt(val/1000)*3;
+  return Math.max(8, Math.min(r, 120));
+}
+
+// ── Fetch ─────────────────────────────────────────────────────────────────────
+async function searchDex(q) {
+  try {
+    var r = await fetch(DEXSCR+'/search?q='+encodeURIComponent(q));
+    if (!r.ok) return [];
+    var j = await r.json();
+    return (j.pairs||[]).filter(function(p){return p.chainId==='pulsechain';});
+  } catch(e) { return []; }
+}
+
+async function loadData() {
+  document.getElementById('loading').style.display='flex';
+  if (animFrame) cancelAnimationFrame(animFrame);
+
+  var results = await Promise.all([
+    searchDex('PulseX WPLS'),
+    searchDex('PulseX HEX'),
+    searchDex('PulseX USDC'),
+    searchDex('9mm PulseChain'),
+    searchDex('9inch PulseChain'),
+    searchDex('PLSX WPLS'),
+    searchDex('HEX WPLS'),
+    searchDex('DAI PulseChain'),
+    searchDex('PulseChain liquidity'),
+    searchDex('Daytona PulseChain'),
+  ]);
+
+  var seen = {};
+  pools = [];
+  results.forEach(function(arr){
+    arr.forEach(function(p){
+      var tvl = parseFloat(p.liquidity&&p.liquidity.usd||0);
+      if (p.pairAddress && !seen[p.pairAddress] && tvl>100) {
+        seen[p.pairAddress]=true;
+        pools.push(p);
+      }
+    });
+  });
+
+  updateInlineStats();
+  buildBubbles();
+  document.getElementById('loading').style.display='none';
+  startSim();
+}
+
+// ── Build bubbles ─────────────────────────────────────────────────────────────
+function buildBubbles() {
+  resize();
+  var filtered = pools.filter(function(p){
+    return parseFloat(p.liquidity&&p.liquidity.usd||0) >= minLiq;
+  });
+
+  // Group by DEX for clustering
+  var dexCenters = {
+    pulsex:    {x:W*0.25, y:H*0.35},
+    pulsex_v2: {x:W*0.35, y:H*0.55},
+    pulsexss:  {x:W*0.20, y:H*0.55},
+    '9mm':     {x:W*0.65, y:H*0.35},
+    '9mmv3':   {x:W*0.70, y:H*0.55},
+    '9inch':   {x:W*0.75, y:H*0.65},
+    daytona:   {x:W*0.50, y:H*0.75},
+    default:   {x:W*0.50, y:H*0.50},
+  };
+
+  bubbles = filtered.map(function(p) {
+    var dk = getDexKey(p.dexId);
+    var center = dexCenters[dk]||dexCenters.default;
+    var r = getBubbleRadius(p);
+    return {
+      p: p,
+      x: center.x + (Math.random()-0.5)*200,
+      y: center.y + (Math.random()-0.5)*200,
+      vx: 0, vy: 0,
+      r: r,
+      targetX: center.x,
+      targetY: center.y,
+      color: getBubbleColor(p),
+      label: (p.baseToken&&p.baseToken.symbol||'?')+'/\n'+(p.quoteToken&&p.quoteToken.symbol||'?'),
+      dexKey: dk,
+    };
+  });
+
+  document.getElementById('si-pools').textContent = filtered.length;
+}
+
+// ── Physics simulation ────────────────────────────────────────────────────────
+function simulate() {
+  var n = bubbles.length;
+
+  for (var i=0; i<n; i++) {
+    var b = bubbles[i];
+
+    // Pull toward DEX cluster center
+    b.vx += (b.targetX - b.x) * CENTER_STRENGTH;
+    b.vy += (b.targetY - b.y) * CENTER_STRENGTH;
+
+    // Collision avoidance
+    for (var j=i+1; j<n; j++) {
+      var b2 = bubbles[j];
+      var dx = b.x - b2.x;
+      var dy = b.y - b2.y;
+      var dist = Math.sqrt(dx*dx+dy*dy)||1;
+      var minDist = b.r + b2.r + 3;
+      if (dist < minDist) {
+        var force = (minDist-dist)/dist * COLLIDE_STRENGTH;
+        var fx = dx*force*0.5;
+        var fy = dy*force*0.5;
+        b.vx  += fx; b.vy  += fy;
+        b2.vx -= fx; b2.vy -= fy;
+      }
+    }
+
+    // Damping
+    b.vx *= 0.85;
+    b.vy *= 0.85;
+
+    // Update position
+    b.x += b.vx;
+    b.y += b.vy;
+
+    // Wall bounce
+    if (b.x-b.r < 0)  { b.x = b.r;    b.vx *= -0.5; }
+    if (b.x+b.r > W)  { b.x = W-b.r;  b.vx *= -0.5; }
+    if (b.y-b.r < 0)  { b.y = b.r;    b.vy *= -0.5; }
+    if (b.y+b.r > H)  { b.y = H-b.r;  b.vy *= -0.5; }
+  }
+}
+
+// ── Draw ──────────────────────────────────────────────────────────────────────
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+
+  // Draw connections between bubbles sharing a token
+  ctx.save();
+  ctx.globalAlpha = 0.06;
+  for (var i=0; i<bubbles.length; i++) {
+    var b1 = bubbles[i];
+    var s0 = b1.p.baseToken&&b1.p.baseToken.symbol||'';
+    var s1 = b1.p.quoteToken&&b1.p.quoteToken.symbol||'';
+    for (var j=i+1; j<bubbles.length; j++) {
+      var b2 = bubbles[j];
+      var t0 = b2.p.baseToken&&b2.p.baseToken.symbol||'';
+      var t1 = b2.p.quoteToken&&b2.p.quoteToken.symbol||'';
+      // Connect if they share a token
+      if (s0===t0||s0===t1||s1===t0||s1===t1) {
+        ctx.beginPath();
+        ctx.moveTo(b1.x, b1.y);
+        ctx.lineTo(b2.x, b2.y);
+        ctx.strokeStyle = b1.color;
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+      }
+    }
+  }
+  ctx.restore();
+
+  // Draw bubbles
+  for (var i=0; i<bubbles.length; i++) {
+    var b = bubbles[i];
+    var isHovered = hoveredBubble === b;
+
+    // Glow for hovered
+    if (isHovered) {
+      ctx.save();
+      ctx.shadowColor = b.color;
+      ctx.shadowBlur = 20;
+    }
+
+    // Bubble fill
+    var grad = ctx.createRadialGradient(b.x-b.r*0.3, b.y-b.r*0.3, b.r*0.1, b.x, b.y, b.r);
+    grad.addColorStop(0, hexToRgba(b.color, 0.6));
+    grad.addColorStop(0.7, hexToRgba(b.color, 0.3));
+    grad.addColorStop(1, hexToRgba(b.color, 0.1));
+
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r, 0, Math.PI*2);
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // Border
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r, 0, Math.PI*2);
+    ctx.strokeStyle = hexToRgba(b.color, isHovered?0.9:0.4);
+    ctx.lineWidth = isHovered ? 2 : 1;
+    ctx.stroke();
+
+    if (isHovered) ctx.restore();
+
+    // Label (only if bubble is big enough)
+    if (b.r > 22) {
+      ctx.save();
+      ctx.fillStyle = 'rgba(241,240,255,'+(isHovered?0.95:0.75)+')';
+      ctx.font = 'bold '+(Math.min(b.r*0.28,13))+'px -apple-system,sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      var parts = b.label.split('\n');
+      if (parts.length===2 && b.r>30) {
+        ctx.fillText(parts[0], b.x, b.y-b.r*0.15);
+        ctx.font = (Math.min(b.r*0.22,10))+'px -apple-system,sans-serif';
+        ctx.fillStyle = 'rgba(149,146,168,0.8)';
+        ctx.fillText(parts[1], b.x, b.y+b.r*0.2);
+      } else {
+        ctx.fillText(parts[0], b.x, b.y);
+      }
+
+      // TVL label for big bubbles
+      if (b.r > 50) {
+        var tvl = parseFloat(b.p.liquidity&&b.p.liquidity.usd||0);
+        ctx.font = (Math.min(b.r*0.18,10))+'px Courier New,monospace';
+        ctx.fillStyle = 'rgba(149,146,168,0.7)';
+        ctx.fillText(fmt(tvl), b.x, b.y+b.r*0.45);
+      }
+      ctx.restore();
+    }
+  }
+
+  // DEX cluster labels
+  drawDexLabels();
+}
+
+function drawDexLabels() {
+  // Find centroid of each DEX group
+  var groups = {};
+  bubbles.forEach(function(b){
+    if (!groups[b.dexKey]) groups[b.dexKey]={x:0,y:0,n:0,color:b.color};
+    groups[b.dexKey].x += b.x;
+    groups[b.dexKey].y += b.y;
+    groups[b.dexKey].n++;
+  });
+
+  ctx.save();
+  Object.keys(groups).forEach(function(k){
+    var g = groups[k];
+    if (g.n < 1) return;
+    var cx = g.x/g.n;
+    var cy = g.y/g.n - 60; // above the cluster
+
+    // Find topmost bubble in cluster
+    var topY = Math.min.apply(null, bubbles.filter(function(b){return b.dexKey===k;}).map(function(b){return b.y-b.r;}));
+
+    ctx.font = 'bold 11px -apple-system,sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = hexToRgba(g.color, 0.7);
+    ctx.fillText(DEX_LABELS[k]||k, cx, topY-10);
+  });
+  ctx.restore();
+}
+
+// ── Animation loop ────────────────────────────────────────────────────────────
+var simSteps = 0;
+function startSim() {
+  simSteps = 0;
+  function loop() {
+    // Run physics for first 300 frames, then slow down
+    if (simSteps < 300) {
+      simulate();
+      simSteps++;
+    } else if (simSteps < 600) {
+      // Slow physics
+      if (simSteps % 3 === 0) simulate();
+      simSteps++;
+    }
+    draw();
+    animFrame = requestAnimationFrame(loop);
+  }
+  animFrame = requestAnimationFrame(loop);
+}
+
+// ── Interaction ───────────────────────────────────────────────────────────────
+function getHoveredBubble(mx, my) {
+  for (var i=bubbles.length-1; i>=0; i--) {
+    var b = bubbles[i];
+    var dx = mx-b.x, dy = my-b.y;
+    if (dx*dx+dy*dy <= b.r*b.r) return b;
+  }
+  return null;
+}
+
+canvas.addEventListener('mousemove', function(e) {
+  var rect = canvas.getBoundingClientRect();
+  var mx = e.clientX-rect.left;
+  var my = e.clientY-rect.top;
+  var b = getHoveredBubble(mx*W/rect.width, my*H/rect.height);
+  hoveredBubble = b;
+  canvas.style.cursor = b ? 'pointer' : 'default';
+
+  var tt = document.getElementById('tooltip');
+  if (b) {
+    var p = b.p;
+    var s0 = p.baseToken&&p.baseToken.symbol||'?';
+    var s1 = p.quoteToken&&p.quoteToken.symbol||'?';
+    var tvl = parseFloat(p.liquidity&&p.liquidity.usd||0);
+    var vol = parseFloat(p.volume&&p.volume.h24||0);
+    var apr = calcAPR(p);
+    var ch  = parseFloat(p.priceChange&&p.priceChange.h24||0);
+    var dk  = getDexKey(p.dexId);
+    var logo = p.info&&p.info.imageUrl;
+
+    document.getElementById('tt-icon').innerHTML = logo ?
+      '<img src="'+logo+'" onerror="this.parentElement.textContent=\''+s0.slice(0,3)+'\'">':
+      s0.slice(0,3);
+    document.getElementById('tt-name').textContent = s0+' / '+s1;
+    document.getElementById('tt-dex').textContent  = DEX_LABELS[dk]||dk;
+    document.getElementById('tt-tvl').textContent  = fmt(tvl);
+    document.getElementById('tt-vol').textContent  = fmt(vol);
+    document.getElementById('tt-apr').textContent  = apr.toFixed(1)+'%';
+    var chEl = document.getElementById('tt-chg');
+    chEl.textContent = (ch>=0?'+':'')+ch.toFixed(1)+'%';
+    chEl.className = 'tt-stat-val '+(ch>=0?'green':'red');
+
+    var addUrl = (DEX_ADD_URLS[dk]||DEX_ADD_URLS.default)+(p.baseToken&&p.baseToken.address||'')+'/'+(p.quoteToken&&p.quoteToken.address||'');
+    document.getElementById('tt-dex-link').href = addUrl;
+    document.getElementById('tt-chart-link').href = 'https://dexscreener.com/pulsechain/'+(p.pairAddress||'');
+
+    // Position tooltip
+    var tx = e.clientX+16, ty = e.clientY-10;
+    var ttW = 240, ttH = 160;
+    if (tx+ttW > window.innerWidth) tx = e.clientX-ttW-16;
+    if (ty+ttH > window.innerHeight) ty = e.clientY-ttH-10;
+    tt.style.left = tx+'px';
+    tt.style.top  = ty+'px';
+    tt.style.display = 'block';
+  } else {
+    tt.style.display = 'none';
+  }
+});
+
+canvas.addEventListener('click', function(e) {
+  var rect = canvas.getBoundingClientRect();
+  var mx = e.clientX-rect.left;
+  var my = e.clientY-rect.top;
+  var b = getHoveredBubble(mx*W/rect.width, my*H/rect.height);
+  if (b) {
+    window.open('https://dexscreener.com/pulsechain/'+(b.p.pairAddress||''), '_blank');
+  }
+});
+
+canvas.addEventListener('mouseleave', function(){
+  hoveredBubble = null;
+  document.getElementById('tooltip').style.display = 'none';
+});
+
+// ── Resize ────────────────────────────────────────────────────────────────────
+function resize() {
+  var wrap = canvas.parentElement;
+  W = canvas.width  = wrap.clientWidth;
+  H = canvas.height = wrap.clientHeight;
+}
+window.addEventListener('resize', function(){
+  resize();
+  if (pools.length) buildBubbles();
+});
+
+// ── Control handlers ──────────────────────────────────────────────────────────
+function setSizeBy(v,el) {
+  sizeBy=v;
+  toggleActive(el);
+  bubbles.forEach(function(b){b.r=getBubbleRadius(b.p);});
+}
+function setColorBy(v,el) {
+  colorBy=v;
+  toggleActive(el);
+  bubbles.forEach(function(b){b.color=getBubbleColor(b.p);});
+  updateLegend();
+}
+function setMinLiq(v,el) {
+  minLiq=v;
+  toggleActive(el);
+  buildBubbles();
+  startSim();
+}
+function toggleActive(el) {
+  el.parentElement.querySelectorAll('.cbtn').forEach(function(b){b.classList.remove('active');});
+  el.classList.add('active');
+}
+
+function updateLegend() {
+  var leg = document.getElementById('legend');
+  if (colorBy==='dex') {
+    leg.innerHTML = '<div class="legend-title">DEX</div>' +
+      '<div class="legend-item"><div class="legend-dot" style="background:#3B82F6;"></div>PulseX V1</div>' +
+      '<div class="legend-item"><div class="legend-dot" style="background:#9D4EDD;"></div>PulseX V2</div>' +
+      '<div class="legend-item"><div class="legend-dot" style="background:#F59E0B;"></div>9mm</div>' +
+      '<div class="legend-item"><div class="legend-dot" style="background:#EF4444;"></div>9inch</div>' +
+      '<div class="legend-item"><div class="legend-dot" style="background:#22C55E;"></div>Other</div>';
+  } else if (colorBy==='change') {
+    leg.innerHTML = '<div class="legend-title">24h Change</div>' +
+      '<div class="legend-item"><div class="legend-dot" style="background:#22C55E;"></div>>+10%</div>' +
+      '<div class="legend-item"><div class="legend-dot" style="background:#86EFAC;"></div>0 to +10%</div>' +
+      '<div class="legend-item"><div class="legend-dot" style="background:#FCA5A5;"></div>0 to -10%</div>' +
+      '<div class="legend-item"><div class="legend-dot" style="background:#EF4444;"></div><-10%</div>';
+  } else {
+    leg.innerHTML = '<div class="legend-title">Est. APR</div>' +
+      '<div class="legend-item"><div class="legend-dot" style="background:#22C55E;"></div>>100%</div>' +
+      '<div class="legend-item"><div class="legend-dot" style="background:#86EFAC;"></div>50-100%</div>' +
+      '<div class="legend-item"><div class="legend-dot" style="background:#FCD34D;"></div>20-50%</div>' +
+      '<div class="legend-item"><div class="legend-dot" style="background:#F59E0B;"></div>5-20%</div>' +
+      '<div class="legend-item"><div class="legend-dot" style="background:#6B6880;"></div><5%</div>';
+  }
+}
+
+function updateInlineStats() {
+  var filtered = pools.filter(function(p){return parseFloat(p.liquidity&&p.liquidity.usd||0)>=minLiq;});
+  var totalTVL = filtered.reduce(function(s,p){return s+parseFloat(p.liquidity&&p.liquidity.usd||0);},0);
+  var totalVol = filtered.reduce(function(s,p){return s+parseFloat(p.volume&&p.volume.h24||0);},0);
+  document.getElementById('si-tvl').textContent = fmt(totalTVL);
+  document.getElementById('si-vol').textContent = fmt(totalVol);
+}
+
+// ── Hex to rgba ───────────────────────────────────────────────────────────────
+function hexToRgba(hex, alpha) {
+  var r=parseInt(hex.slice(1,3),16);
+  var g=parseInt(hex.slice(3,5),16);
+  var b=parseInt(hex.slice(5,7),16);
+  return 'rgba('+r+','+g+','+b+','+alpha+')';
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+canvas = document.getElementById('bubble-canvas');
+ctx = canvas.getContext('2d');
+resize();
+loadData();
+setInterval(loadData, 120000);
+</script>
+</body>
+</html>
