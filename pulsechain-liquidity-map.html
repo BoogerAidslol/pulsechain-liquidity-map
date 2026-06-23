@@ -186,12 +186,14 @@ function getDexKey(dexId) {
   if (!dexId) return 'default';
   var d = dexId.toLowerCase();
   if (d.includes('pulsexss')||d.includes('stable')) return 'pulsexss';
-  if (d.includes('pulsex_v2')||d.includes('pulsexv2')) return 'pulsex_v2';
+  if (d.includes('pulsex-v2')||d.includes('pulsex_v2')||d.includes('pulsexv2')) return 'pulsex_v2';
   if (d.includes('pulsex')) return 'pulsex';
-  if (d.includes('9mmv3')||d.includes('9mm-v3')) return '9mmv3';
+  if (d.includes('9mm-v3')||d.includes('9mmv3')) return '9mmv3';
   if (d.includes('9mm')) return '9mm';
   if (d.includes('9inch')) return '9inch';
   if (d.includes('daytona')) return 'daytona';
+  if (d.includes('phux')) return 'pulsex_v2'; // similar color
+  if (d.includes('spark')) return 'daytona';
   return 'default';
 }
 
@@ -223,6 +225,8 @@ function fmt(v) {
 }
 
 function calcAPR(p) {
+  // Use DefiLlama APY if available (more accurate)
+  if (p._apy && p._apy > 0) return Math.min(p._apy, 99999);
   var vol = parseFloat(p.volume&&p.volume.h24||0);
   var tvl = parseFloat(p.liquidity&&p.liquidity.usd||0);
   if (!tvl||!vol) return 0;
@@ -275,33 +279,56 @@ async function searchDex(q) {
 
 // Fetch pairs directly by known pair addresses - always works, no rate limits
 async function fetchKnownPairs() {
-  // Top PulseChain pair addresses - sourced from PulseX, 9mm, 9inch
-  var KNOWN_PAIRS = [
-    // PulseX V1 major pairs
-    '0xe56043671df55de5cdf8459710433c10324de0ae', // WPLS/HEX
-    '0x6753560538eca67617a9ce605178f788be7e524e', // WPLS/PLSX
-    '0x0cfb86b5b3e12b7a4ce5bae6a9c5cf57e4e5b8e4', // WPLS/DAI
-    '0xf808bb6265e9ca27002c0a04562bf50d4fe37eaa', // WPLS/USDC
-    '0x8706f7e5a3bac3dcbdfd58c40e04fce4b6a4a01e', // HEX/PLSX
-    // PulseX V2 major pairs
-    '0x1b45b9460f0f58bc0b24647e6d56cf8db73aac69', // WPLS/HEX V2
-    '0x67d6ed5607a0fddf5b5c3ca4c8b5d32f5f0e8e1a', // WPLS/PLSX V2
-    // 9mm pairs
-    '0x2e8b484bc4c3df091c69dc5af3d26e21d98deebe', // 9mm WPLS/HEX
-  ];
-
   var results = [];
-  // Fetch in batches of 30 (DexScreener limit)
-  for (var i=0; i<KNOWN_PAIRS.length; i+=30) {
-    var batch = KNOWN_PAIRS.slice(i,i+30);
+
+  // Primary: DefiLlama yields API - gets ALL pools on PulseChain
+  try {
+    var r = await fetch('https://yields.llama.fi/pools');
+    if (r.ok) {
+      var j = await r.json();
+      var pulsePools = (j.data||[]).filter(function(p){
+        return p.chain && p.chain.toLowerCase().includes('pulse') && parseFloat(p.tvlUsd||0)>100;
+      });
+
+      // Convert DefiLlama format to our bubble format
+      pulsePools.forEach(function(p) {
+        var sym = p.symbol||'???';
+        var parts = sym.split('-');
+        results.push({
+          pairAddress: p.pool||p.project+'-'+sym,
+          chainId: 'pulsechain',
+          dexId: p.project||'unknown',
+          baseToken:  {symbol: parts[0]||sym, address: p.pool||''},
+          quoteToken: {symbol: parts[1]||'?', address: ''},
+          liquidity:  {usd: p.tvlUsd||0},
+          volume:     {h24: p.volumeUsd7d ? p.volumeUsd7d/7 : 0},
+          priceChange:{h24: p.apyPct7D||0},
+          txns:       {h24:{buys:0,sells:0}},
+          info:       {imageUrl: null},
+          _llama:     true,
+          _apy:       p.apy||0,
+          _project:   p.project||'',
+        });
+      });
+    }
+  } catch(e) {}
+
+  // Fallback: known pair addresses via DexScreener
+  if (results.length < 5) {
+    var KNOWN_PAIRS = [
+      '0xe56043671df55de5cdf8459710433c10324de0ae',
+      '0x6753560538eca67617a9ce605178f788be7e524e',
+      '0x1b45b9460f0f58bc0b24647e6d56cf8db73aac69',
+    ];
     try {
-      var r = await fetch('https://api.dexscreener.com/latest/dex/pairs/pulsechain/'+batch.join(','));
-      if (r.ok) {
-        var j = await r.json();
-        (j.pairs||[]).forEach(function(p){ if(p.chainId==='pulsechain') results.push(p); });
+      var r2 = await fetch('https://api.dexscreener.com/latest/dex/pairs/pulsechain/'+KNOWN_PAIRS.join(','));
+      if (r2.ok) {
+        var j2 = await r2.json();
+        (j2.pairs||[]).forEach(function(p){ if(p.chainId==='pulsechain') results.push(p); });
       }
     } catch(e) {}
   }
+
   return results;
 }
 
