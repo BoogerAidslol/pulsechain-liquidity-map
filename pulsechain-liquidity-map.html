@@ -271,22 +271,44 @@ async function searchDex(q) {
   } catch(e) { return []; }
 }
 
+async function searchDexTimeout(q) {
+  return new Promise(function(resolve) {
+    var done = false;
+    var timer = setTimeout(function(){
+      if (!done) { done=true; resolve([]); }
+    }, 8000);
+    searchDex(q).then(function(r){
+      if (!done) { done=true; clearTimeout(timer); resolve(r); }
+    }).catch(function(){ if (!done) { done=true; clearTimeout(timer); resolve([]); } });
+  });
+}
+
 async function loadData() {
   document.getElementById('loading').style.display='flex';
   if (animFrame) cancelAnimationFrame(animFrame);
 
+  // Show partial results after 5 seconds no matter what
+  var partialTimer = setTimeout(function(){
+    if (pools.length > 0) {
+      document.getElementById('loading').style.display='none';
+      buildBubbles();
+      startSim();
+    }
+  }, 5000);
+
   var results = await Promise.all([
-    searchDex('PulseX WPLS'),
-    searchDex('PulseX HEX'),
-    searchDex('PulseX USDC'),
-    searchDex('9mm PulseChain'),
-    searchDex('9inch PulseChain'),
-    searchDex('PLSX WPLS'),
-    searchDex('HEX WPLS'),
-    searchDex('DAI PulseChain'),
-    searchDex('PulseChain liquidity'),
-    searchDex('Daytona PulseChain'),
+    searchDexTimeout('PulseX WPLS'),
+    searchDexTimeout('PulseX HEX'),
+    searchDexTimeout('PulseX USDC'),
+    searchDexTimeout('9mm PulseChain'),
+    searchDexTimeout('9inch PulseChain'),
+    searchDexTimeout('PLSX WPLS'),
+    searchDexTimeout('HEX WPLS'),
+    searchDexTimeout('DAI PulseChain'),
+    searchDexTimeout('PulseChain liquidity'),
+    searchDexTimeout('Daytona PulseChain'),
   ]);
+  clearTimeout(partialTimer);
 
   var seen = {};
   pools = [];
