@@ -9,7 +9,7 @@
 :root{--pulse:#9D4EDD;--green:#22C55E;--red:#EF4444;--amber:#F59E0B;--blue:#3B82F6;--bg:#0A0A0F;--bg2:#111118;--bg3:#18181F;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);--text:#F1F0FF;--muted:#6B6880;--sub:#9592A8;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;height:100vh;overflow:hidden;display:flex;flex-direction:column;}
-header{border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:rgba(10,10,15,0.97);z-index:10;}
+header{border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:rgba(10,10,15,0.97);}
 .logo{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:600;}
 .logo-icon{width:27px;height:27px;background:linear-gradient(135deg,#9D4EDD,#6B21A8);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;}
 .hright{display:flex;align-items:center;gap:10px;}
@@ -19,51 +19,54 @@ header{border-bottom:1px solid var(--border);padding:12px 20px;display:flex;alig
 .btn{background:var(--bg2);border:1px solid var(--border2);color:var(--sub);border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;font-family:inherit;}
 .btn:hover{border-color:var(--pulse);color:var(--text);}
 
-/* Controls bar */
-.controls{padding:10px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg2);}
+.controls{padding:8px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg2);}
 .ctrl-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;}
 .cbtn{background:var(--bg3);border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:4px 11px;font-size:11px;cursor:pointer;font-family:inherit;}
 .cbtn:hover{border-color:var(--border2);color:var(--sub);}
 .cbtn.active{background:rgba(157,78,221,0.1);border-color:var(--pulse);color:var(--pulse);}
-.stats-inline{display:flex;gap:16px;margin-left:auto;}
+.stats-inline{display:flex;gap:16px;margin-left:auto;flex-wrap:wrap;}
 .si{font-size:11px;color:var(--muted);}
 .si span{color:var(--text);font-weight:600;font-family:'Courier New',monospace;}
 
-/* Canvas area */
 .canvas-wrap{flex:1;position:relative;overflow:hidden;}
 #bubble-canvas{width:100%;height:100%;}
 
 /* Tooltip */
-.tooltip{position:absolute;background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:14px 16px;pointer-events:none;display:none;z-index:100;min-width:220px;box-shadow:0 8px 24px rgba(0,0,0,0.4);}
+.tooltip{position:absolute;background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:14px 16px;pointer-events:none;display:none;z-index:100;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.4);}
 .tt-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
-.tt-icon{width:28px;height:28px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--sub);overflow:hidden;flex-shrink:0;}
-.tt-icon img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.tt-logo{width:30px;height:30px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--sub);overflow:hidden;flex-shrink:0;}
+.tt-logo img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
 .tt-name{font-size:13px;font-weight:600;}
-.tt-dex{font-size:10px;color:var(--muted);font-family:'Courier New',monospace;}
-.tt-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.tt-stat-lbl{font-size:10px;color:var(--muted);margin-bottom:2px;}
-.tt-stat-val{font-size:13px;font-weight:600;font-family:'Courier New',monospace;}
-.tt-stat-val.green{color:var(--green);}
-.tt-stat-val.red{color:var(--red);}
-.tt-stat-val.amber{color:var(--amber);}
-.tt-footer{margin-top:10px;padding-top:8px;border-top:1px solid var(--border);display:flex;gap:8px;}
+.tt-sub{font-size:10px;color:var(--muted);margin-top:2px;}
+.tt-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.tt-lbl{font-size:10px;color:var(--muted);margin-bottom:2px;}
+.tt-val{font-size:13px;font-weight:600;font-family:'Courier New',monospace;}
+.tt-val.green{color:var(--green);}
+.tt-val.red{color:var(--red);}
+.tt-val.amber{color:var(--amber);}
+.tt-pools{font-size:11px;color:var(--sub);border-top:1px solid var(--border);padding-top:8px;margin-top:4px;max-height:120px;overflow-y:auto;}
+.tt-pool-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+.tt-footer{margin-top:8px;display:flex;gap:8px;}
 .tt-link{font-size:11px;color:var(--pulse);text-decoration:none;opacity:0.8;}
 .tt-link:hover{opacity:1;}
 
 /* Legend */
-.legend{position:absolute;bottom:20px;left:20px;background:rgba(17,17,24,0.9);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:11px;}
-.legend-title{color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px;font-size:10px;}
-.legend-item{display:flex;align-items:center;gap:7px;margin-bottom:5px;color:var(--sub);}
-.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
-.legend-size{display:flex;align-items:center;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
-.ls-circle{border-radius:50%;background:rgba(157,78,221,0.3);border:1px solid rgba(157,78,221,0.5);flex-shrink:0;}
+.legend{position:absolute;bottom:16px;left:16px;background:rgba(17,17,24,0.92);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:11px;min-width:160px;}
+.leg-title{color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px;font-size:10px;}
+.leg-item{display:flex;align-items:center;gap:7px;margin-bottom:5px;color:var(--sub);}
+.leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
 
-/* Loading overlay */
+/* View toggle */
+.view-info{position:absolute;top:16px;right:16px;background:rgba(17,17,24,0.92);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:11px;color:var(--muted);max-width:200px;line-height:1.5;}
+
+/* Loading */
 .loading-overlay{position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:50;}
 .spinner{width:28px;height:28px;border:2px solid var(--border2);border-top-color:var(--pulse);border-radius:50%;animation:spin 0.75s linear infinite;margin-bottom:14px;}
 @keyframes spin{to{transform:rotate(360deg);}}
-.loading-text{font-size:14px;color:var(--sub);margin-bottom:6px;}
-.loading-sub{font-size:12px;color:var(--muted);}
+.load-text{font-size:14px;color:var(--sub);margin-bottom:6px;}
+.load-sub{font-size:12px;color:var(--muted);}
+.load-progress{width:200px;height:3px;background:var(--bg3);border-radius:2px;margin-top:14px;overflow:hidden;}
+.load-fill{height:100%;background:var(--pulse);border-radius:2px;transition:width 0.3s ease;width:0%;}
 </style>
 </head>
 <body>
@@ -77,740 +80,706 @@ header{border-bottom:1px solid var(--border);padding:12px 20px;display:flex;alig
 </header>
 
 <div class="controls">
-  <span class="ctrl-label">Size by:</span>
+  <span class="ctrl-label">Size:</span>
   <button class="cbtn active" onclick="setSizeBy('tvl',this)">TVL</button>
   <button class="cbtn" onclick="setSizeBy('volume',this)">Volume</button>
-  <button class="cbtn" onclick="setSizeBy('apr',this)">APR</button>
+  <button class="cbtn" onclick="setSizeBy('apy',this)">APY</button>
 
-  <span class="ctrl-label" style="margin-left:8px;">Color by:</span>
-  <button class="cbtn active" onclick="setColorBy('dex',this)">DEX</button>
+  <span class="ctrl-label" style="margin-left:6px;">Color:</span>
+  <button class="cbtn active" onclick="setColorBy('category',this)">Category</button>
   <button class="cbtn" onclick="setColorBy('change',this)">24h Change</button>
-  <button class="cbtn" onclick="setColorBy('apr',this)">APR</button>
+  <button class="cbtn" onclick="setColorBy('apy',this)">APY</button>
 
-  <span class="ctrl-label" style="margin-left:8px;">Show:</span>
-  <button class="cbtn active" onclick="setMinLiq(0,this)">All</button>
-  <button class="cbtn" onclick="setMinLiq(10000,this)">$10K+</button>
-  <button class="cbtn" onclick="setMinLiq(100000,this)">$100K+</button>
-  <button class="cbtn" onclick="setMinLiq(1000000,this)">$1M+</button>
+  <span class="ctrl-label" style="margin-left:6px;">View:</span>
+  <button class="cbtn active" onclick="setView('protocol',this)">Protocols</button>
+  <button class="cbtn" onclick="setView('pool',this)">Pools</button>
+  <button class="cbtn" onclick="setView('both',this)">Both</button>
+
+  <span class="ctrl-label" style="margin-left:6px;">Min TVL:</span>
+  <button class="cbtn active" onclick="setMinTVL(0,this)">All</button>
+  <button class="cbtn" onclick="setMinTVL(10000,this)">$10K+</button>
+  <button class="cbtn" onclick="setMinTVL(100000,this)">$100K+</button>
+  <button class="cbtn" onclick="setMinTVL(1000000,this)">$1M+</button>
 
   <div class="stats-inline">
+    <div class="si">Protocols: <span id="si-protos">—</span></div>
     <div class="si">Pools: <span id="si-pools">—</span></div>
     <div class="si">Total TVL: <span id="si-tvl">—</span></div>
-    <div class="si">Vol 24h: <span id="si-vol">—</span></div>
   </div>
 </div>
 
 <div class="canvas-wrap">
   <canvas id="bubble-canvas"></canvas>
 
-  <!-- Loading overlay -->
   <div class="loading-overlay" id="loading">
     <div class="spinner"></div>
-    <div class="loading-text">Loading PulseChain liquidity data...</div>
-    <div class="loading-sub">Fetching pools from all DEXs</div>
+    <div class="load-text" id="load-text">Loading PulseChain data...</div>
+    <div class="load-sub" id="load-sub">Fetching from DefiLlama & DexScreener</div>
+    <div class="load-progress"><div class="load-fill" id="load-fill"></div></div>
   </div>
 
-  <!-- Tooltip -->
   <div class="tooltip" id="tooltip">
     <div class="tt-header">
-      <div class="tt-icon" id="tt-icon"></div>
-      <div>
-        <div class="tt-name" id="tt-name"></div>
-        <div class="tt-dex" id="tt-dex"></div>
-      </div>
+      <div class="tt-logo" id="tt-logo"></div>
+      <div><div class="tt-name" id="tt-name"></div><div class="tt-sub" id="tt-sub"></div></div>
     </div>
     <div class="tt-stats">
-      <div><div class="tt-stat-lbl">TVL</div><div class="tt-stat-val" id="tt-tvl"></div></div>
-      <div><div class="tt-stat-lbl">Vol 24h</div><div class="tt-stat-val" id="tt-vol"></div></div>
-      <div><div class="tt-stat-lbl">Est. APR</div><div class="tt-stat-val amber" id="tt-apr"></div></div>
-      <div><div class="tt-stat-lbl">24h Change</div><div class="tt-stat-val" id="tt-chg"></div></div>
+      <div><div class="tt-lbl">TVL</div><div class="tt-val" id="tt-tvl"></div></div>
+      <div><div class="tt-lbl">Vol 24h</div><div class="tt-val" id="tt-vol"></div></div>
+      <div><div class="tt-lbl">APY</div><div class="tt-val amber" id="tt-apy"></div></div>
+      <div><div class="tt-lbl">24h Change</div><div class="tt-val" id="tt-chg"></div></div>
     </div>
+    <div class="tt-pools" id="tt-pools"></div>
     <div class="tt-footer">
-      <a class="tt-link" id="tt-dex-link" href="#" target="_blank">Add Liquidity ↗</a>
-      <a class="tt-link" id="tt-chart-link" href="#" target="_blank">Chart ↗</a>
+      <a class="tt-link" id="tt-link1" href="#" target="_blank">View ↗</a>
+      <a class="tt-link" id="tt-link2" href="#" target="_blank">DexScreener ↗</a>
     </div>
   </div>
 
-  <!-- Legend -->
-  <div class="legend" id="legend">
-    <div class="legend-title">DEX</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#3B82F6;"></div>PulseX V1</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#9D4EDD;"></div>PulseX V2</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#F59E0B;"></div>9mm</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#EF4444;"></div>9inch</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#22C55E;"></div>Other</div>
-    <div class="legend-size">
-      <div class="ls-circle" style="width:10px;height:10px;"></div>
-      <span style="color:var(--muted);font-size:10px;">= $10K TVL</span>
-      <div class="ls-circle" style="width:20px;height:20px;margin-left:8px;"></div>
-      <span style="color:var(--muted);font-size:10px;">= $1M TVL</span>
-    </div>
+  <div class="legend" id="legend"></div>
+
+  <div class="view-info" id="view-info">
+    <strong style="color:var(--text);">Protocol View</strong><br>
+    Each bubble = one protocol.<br>
+    Hover for pool breakdown.<br>
+    Click to open on DefiLlama.
   </div>
 </div>
 
 <script>
 // ── Config ────────────────────────────────────────────────────────────────────
-var DEXSCR = 'https://api.dexscreener.com/latest/dex';
+var LLAMA_PROTOS  = 'https://api.llama.fi/protocols';
+var LLAMA_YIELDS  = 'https://yields.llama.fi/pools';
+var DEXSCR        = 'https://api.dexscreener.com/latest/dex/search?q=';
 
-var DEX_COLORS = {
-  pulsex:    '#3B82F6',
-  pulsex_v2: '#9D4EDD',
-  pulsexss:  '#6366F1',
-  '9mm':     '#F59E0B',
-  '9mmv3':   '#D97706',
-  '9inch':   '#EF4444',
-  daytona:   '#22C55E',
-  default:   '#6B6880'
+// Category colors
+var CAT_COLORS = {
+  'Dexes':          '#3B82F6',
+  'Yield':          '#22C55E',
+  'Lending':        '#F59E0B',
+  'Liquid Staking': '#9D4EDD',
+  'Bridge':         '#EF4444',
+  'Farm':           '#10B981',
+  'Staking':        '#8B5CF6',
+  'CDP':            '#F97316',
+  'RWA':            '#06B6D4',
+  'default':        '#6B6880',
 };
 
-var DEX_LABELS = {
-  pulsex:    'PulseX V1',
-  pulsex_v2: 'PulseX V2',
-  pulsexss:  'PulseX Stable',
-  '9mm':     '9mm V2',
-  '9mmv3':   '9mm V3',
-  '9inch':   '9inch',
-  daytona:   'Daytona',
-  default:   'Other DEX'
-};
-
-var DEX_ADD_URLS = {
-  pulsex:    'https://app.pulsex.com/add/',
-  pulsex_v2: 'https://app.pulsex.com/add/',
-  '9mm':     'https://9mm.pro/add/',
-  '9inch':   'https://9inch.io/#/add/',
-  default:   'https://dexscreener.com/pulsechain/'
-};
-
-function getDexKey(dexId) {
-  if (!dexId) return 'default';
-  var d = dexId.toLowerCase();
-  if (d.includes('pulsexss')||d.includes('stable')) return 'pulsexss';
-  if (d.includes('pulsex-v2')||d.includes('pulsex_v2')||d.includes('pulsexv2')) return 'pulsex_v2';
-  if (d.includes('pulsex')) return 'pulsex';
-  if (d.includes('9mm-v3')||d.includes('9mmv3')) return '9mmv3';
-  if (d.includes('9mm')) return '9mm';
-  if (d.includes('9inch')) return '9inch';
-  if (d.includes('daytona')) return 'daytona';
-  if (d.includes('phux')) return 'pulsex_v2'; // similar color
-  if (d.includes('spark')) return 'daytona';
-  return 'default';
+function getCatColor(cat) {
+  return CAT_COLORS[cat] || CAT_COLORS.default;
 }
 
 // ── State ─────────────────────────────────────────────────────────────────────
-var pools = [];
-var bubbles = [];
-var sizeBy   = 'tvl';
-var colorBy  = 'dex';
-var minLiq   = 0;
+var protocols = []; // DefiLlama protocol data
+var pools     = []; // DefiLlama yield pools
+var dexPairs  = []; // DexScreener pairs
+var bubbles   = [];
+var sizeBy    = 'tvl';
+var colorBy   = 'category';
+var viewMode  = 'protocol';
+var minTVL    = 0;
+var hoveredB  = null;
 var animFrame = null;
-var hoveredBubble = null;
-var canvas = document.getElementById('bubble-canvas');
-var ctx = canvas ? canvas.getContext('2d') : null;
-var W = canvas ? canvas.offsetWidth : 800;
-var H = canvas ? canvas.offsetHeight : 600;
-
-// Physics
-var SIM_STRENGTH = 0.03;
-var COLLIDE_STRENGTH = 0.8;
-var CENTER_STRENGTH = 0.02;
+var simSteps  = 0;
+var canvas, ctx, W, H;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
+function showErr(msg) {
+  document.getElementById('loading').style.display='flex';
+  document.getElementById('loading').innerHTML =
+    '<div style="text-align:center;padding:20px;">' +
+    '<div style="font-size:28px;margin-bottom:12px;">⚠️</div>' +
+    '<div style="color:#F1F0FF;font-size:14px;margin-bottom:8px;">Error loading map</div>' +
+    '<div style="color:#9592A8;font-size:12px;margin-bottom:14px;">'+msg+'</div>' +
+    '<button onclick="loadData(false)" style="background:#9D4EDD;color:#fff;border:none;border-radius:8px;padding:8px 18px;cursor:pointer;font-size:13px;">↻ Try Again</button>' +
+    '</div>';
+}
+
 function fmt(v) {
-  if (!v||isNaN(v)) return '$0';
+  if (!v||isNaN(v)||v<=0) return '$0';
   if (v>=1e9) return '$'+(v/1e9).toFixed(2)+'B';
   if (v>=1e6) return '$'+(v/1e6).toFixed(2)+'M';
   if (v>=1000) return '$'+(v/1000).toFixed(1)+'K';
-  return '$'+v.toFixed(0);
+  return '$'+parseFloat(v).toFixed(0);
+}
+function fmtPct(v) { return (v>=0?'+':'')+parseFloat(v||0).toFixed(1)+'%'; }
+function shortAddr(a) { return a?a.slice(0,6)+'...'+a.slice(-4):''; }
+function setProgress(pct,text,sub) {
+  document.getElementById('load-fill').style.width=pct+'%';
+  if(text) document.getElementById('load-text').textContent=text;
+  if(sub)  document.getElementById('load-sub').textContent=sub;
 }
 
-function calcAPR(p) {
-  // Use DefiLlama APY if available (more accurate)
-  if (p._apy && p._apy > 0) return Math.min(p._apy, 99999);
-  var vol = parseFloat(p.volume&&p.volume.h24||0);
-  var tvl = parseFloat(p.liquidity&&p.liquidity.usd||0);
-  if (!tvl||!vol) return 0;
-  return Math.min((vol*0.003/tvl)*365*100, 99999);
-}
-
-function getBubbleColor(p) {
-  if (colorBy==='dex') {
-    var k = getDexKey(p.dexId);
-    return DEX_COLORS[k]||DEX_COLORS.default;
+// ── Data fetching ─────────────────────────────────────────────────────────────
+async function loadData(background) {
+  if(!background) {
+    document.getElementById('loading').style.display='flex';
+    if(animFrame) cancelAnimationFrame(animFrame);
+    protocols=[];pools=[];dexPairs=[];
   }
-  if (colorBy==='change') {
-    var ch = parseFloat(p.priceChange&&p.priceChange.h24||0);
-    if (ch>10) return '#22C55E';
-    if (ch>0)  return '#86EFAC';
-    if (ch>-10)return '#FCA5A5';
-    return '#EF4444';
-  }
-  if (colorBy==='apr') {
-    var apr = calcAPR(p);
-    if (apr>100) return '#22C55E';
-    if (apr>50)  return '#86EFAC';
-    if (apr>20)  return '#FCD34D';
-    if (apr>5)   return '#F59E0B';
-    return '#6B6880';
-  }
-  return DEX_COLORS.default;
-}
+  setProgress(10,'Fetching PulseChain protocols...','Connecting to DefiLlama');
 
-function getBubbleRadius(p) {
-  var val;
-  if (sizeBy==='tvl')    val = parseFloat(p.liquidity&&p.liquidity.usd||0);
-  if (sizeBy==='volume') val = parseFloat(p.volume&&p.volume.h24||0);
-  if (sizeBy==='apr')    val = calcAPR(p);
-  if (!val||val<=0) return 8;
-  // Log scale for radius
-  var r = Math.sqrt(val/1000)*3;
-  return Math.max(8, Math.min(r, 120));
-}
-
-// ── Fetch ─────────────────────────────────────────────────────────────────────
-async function searchDex(q) {
+  // ONLY fetch protocols - fast, ~200KB, no hang
   try {
-    var r = await fetch(DEXSCR+'/search?q='+encodeURIComponent(q));
-    if (!r.ok) return [];
-    var j = await r.json();
-    return (j.pairs||[]).filter(function(p){return p.chainId==='pulsechain';});
-  } catch(e) { return []; }
-}
-
-// Fetch pairs directly by known pair addresses - always works, no rate limits
-async function fetchKnownPairs() {
-  var results = [];
-
-  // Primary: DefiLlama yields API - gets ALL pools on PulseChain
-  try {
-    var r = await fetch('https://yields.llama.fi/pools');
-    if (r.ok) {
+    var ctrl = new AbortController();
+    var timer = setTimeout(function(){ctrl.abort();}, 12000);
+    var r = await fetch(LLAMA_PROTOS, {signal:ctrl.signal});
+    clearTimeout(timer);
+    if(r.ok) {
       var j = await r.json();
-      var pulsePools = (j.data||[]).filter(function(p){
-        return p.chain && p.chain.toLowerCase().includes('pulse') && parseFloat(p.tvlUsd||0)>100;
+      protocols = j.filter(function(p){
+        if(!p.chains) return false;
+        var onPulse = p.chains.some(function(c){return c.toLowerCase().includes('pulse');});
+        if(!onPulse) return false;
+        return getPulseTVL(p) >= 100;
       });
-
-      // Convert DefiLlama format to our bubble format
-      pulsePools.forEach(function(p) {
-        var sym = p.symbol||'???';
-        var parts = sym.split('-');
-        results.push({
-          pairAddress: p.pool||p.project+'-'+sym,
-          chainId: 'pulsechain',
-          dexId: p.project||'unknown',
-          baseToken:  {symbol: parts[0]||sym, address: p.pool||''},
-          quoteToken: {symbol: parts[1]||'?', address: ''},
-          liquidity:  {usd: p.tvlUsd||0},
-          volume:     {h24: p.volumeUsd7d ? p.volumeUsd7d/7 : 0},
-          priceChange:{h24: p.apyPct7D||0},
-          txns:       {h24:{buys:0,sells:0}},
-          info:       {imageUrl: null},
-          _llama:     true,
-          _apy:       p.apy||0,
-          _project:   p.project||'',
-        });
-      });
+      protocols.sort(function(a,b){return getPulseTVL(b)-getPulseTVL(a);});
+      // Cache it
+      try {
+        sessionStorage.setItem('pulse_protocols', JSON.stringify(protocols));
+        sessionStorage.setItem('pulse_cache_time', Date.now().toString());
+      } catch(e){}
+      console.log('Protocols:', protocols.length);
     }
-  } catch(e) {}
+  } catch(e){ console.log('Protocol fetch failed:', e.message); }
 
-  // Fallback: known pair addresses via DexScreener
-  if (results.length < 5) {
-    var KNOWN_PAIRS = [
-      '0xe56043671df55de5cdf8459710433c10324de0ae',
-      '0x6753560538eca67617a9ce605178f788be7e524e',
-      '0x1b45b9460f0f58bc0b24647e6d56cf8db73aac69',
-    ];
-    try {
-      var r2 = await fetch('https://api.dexscreener.com/latest/dex/pairs/pulsechain/'+KNOWN_PAIRS.join(','));
-      if (r2.ok) {
-        var j2 = await r2.json();
-        (j2.pairs||[]).forEach(function(p){ if(p.chainId==='pulsechain') results.push(p); });
-      }
-    } catch(e) {}
-  }
+  setProgress(70,'Building map...','Processing '+protocols.length+' protocols');
+  
+  try { matchPoolsToProtocols(); } catch(e){ console.error('matchPools error:',e); }
+  setProgress(80,'Rendering bubbles...','');
 
-  return results;
-}
-
-async function searchDexTimeout(q) {
-  return new Promise(function(resolve) {
-    var done = false;
-    var timer = setTimeout(function(){
-      if (!done) { done=true; resolve([]); }
-    }, 8000);
-    searchDex(q).then(function(r){
-      if (!done) { done=true; clearTimeout(timer); resolve(r); }
-    }).catch(function(){ if (!done) { done=true; clearTimeout(timer); resolve([]); } });
-  });
-}
-
-async function loadData() {
-  document.getElementById('loading').style.display='flex';
-  if (animFrame) cancelAnimationFrame(animFrame);
-  pools = [];
-  var seen = {};
-
-  function addPool(p) {
-    var tvl = parseFloat(p.liquidity&&p.liquidity.usd||0);
-    if (p.pairAddress && !seen[p.pairAddress] && tvl>100 && p.chainId==='pulsechain') {
-      seen[p.pairAddress] = true;
-      pools.push(p);
+  if(protocols.length > 0) {
+    if(!background) {
+      try { buildBubbles(); } catch(e){ console.error('buildBubbles error:',e); showErr('buildBubbles failed: '+e.message); return; }
+      setProgress(90,'Starting animation...','');
+      document.getElementById('loading').style.display='none';
+      try { updateStats(); } catch(e){ console.error('updateStats error:',e); }
+      try { updateLegend(); } catch(e){ console.error('updateLegend error:',e); }
+      try { startSim(); } catch(e){ console.error('startSim error:',e); showErr('startSim failed: '+e.message); return; }
     }
   }
 
-  function showBubbles() {
-    if (pools.length > 0) {
-      document.getElementById('loading').style.display = 'none';
-      updateInlineStats();
-      buildBubbles();
-      startSim();
-    }
-  }
-
-  // Step 1: Fetch known pairs directly - fast and reliable
-  document.querySelector('.loading-sub').textContent = 'Loading major pairs...';
-  var known = await fetchKnownPairs();
-  known.forEach(addPool);
-  if (pools.length > 0) showBubbles();
-
-  // Step 2: Supplement with search queries one at a time
-  var queries = ['PulseX WPLS','HEX WPLS','9mm PulseChain','9inch PulseChain','PLSX WPLS'];
-  for (var qi=0; qi<queries.length; qi++) {
-    document.querySelector('.loading-sub').textContent = 'Scanning: '+queries[qi]+'...';
-    var results = await searchDex(queries[qi]);
-    results.forEach(addPool);
-    showBubbles();
-    await new Promise(function(res){setTimeout(res,600);});
-  }
-
-  if (pools.length === 0) {
+    if(protocols.length === 0) {
     document.getElementById('loading').innerHTML =
       '<div style="text-align:center;color:#9592A8;">' +
       '<div style="font-size:32px;margin-bottom:12px;">⚠️</div>' +
-      '<div style="font-size:14px;color:#F1F0FF;margin-bottom:8px;">Could not load pool data</div>' +
-      '<div style="font-size:12px;margin-bottom:14px;">DexScreener may be rate limiting. Please wait a moment.</div>' +
+      '<div style="font-size:14px;color:#F1F0FF;margin-bottom:8px;">Could not load data</div>' +
+      '<div style="font-size:12px;margin-bottom:14px;">Please check connection and try again</div>' +
       '<button onclick="loadData()" style="background:#9D4EDD;color:#fff;border:none;border-radius:8px;padding:8px 18px;cursor:pointer;font-size:13px;">↻ Try Again</button>' +
       '</div>';
   }
+}
 
-  var seen = {};
-  pools = [];
-  results.forEach(function(arr){
-    arr.forEach(function(p){
-      var tvl = parseFloat(p.liquidity&&p.liquidity.usd||0);
-      if (p.pairAddress && !seen[p.pairAddress] && tvl>100) {
-        seen[p.pairAddress]=true;
-        pools.push(p);
-      }
+function getPulseTVL(proto) {
+  if(!proto) return 0;
+  var tvl = 0;
+  if(proto.currentChainTvls) {
+    Object.keys(proto.currentChainTvls).forEach(function(k){
+      if(k.toLowerCase().includes('pulse')) tvl += parseFloat(proto.currentChainTvls[k]||0);
     });
-  });
+  }
+  if(tvl < 1 && proto.chains && proto.chains.length===1) tvl = parseFloat(proto.tvl||0);
+  return tvl;
+}
 
-  updateInlineStats();
-  buildBubbles();
-  document.getElementById('loading').style.display='none';
-  startSim();
+function matchPoolsToProtocols() {
+  // Match yield pools to their parent protocol by slug name
+  protocols.forEach(function(proto){
+    proto._pools = pools.filter(function(p){
+      return (p.project||'').toLowerCase() === (proto.slug||proto.name||'').toLowerCase();
+    });
+    proto._pulseTVL = getPulseTVL(proto);
+    proto._vol24 = proto._pools.reduce(function(s,p){
+      return s + (p.volumeUsd7d ? p.volumeUsd7d/7 : 0);
+    },0);
+    proto._bestApy = Math.max.apply(null, proto._pools.map(function(p){return p.apy||0;}).concat([0]));
+  });
 }
 
 // ── Build bubbles ─────────────────────────────────────────────────────────────
 function buildBubbles() {
   resize();
-  var filtered = pools.filter(function(p){
-    return parseFloat(p.liquidity&&p.liquidity.usd||0) >= minLiq;
-  });
+  var items = getItems();
+  // Cap at 60 bubbles max to keep physics fast
+  if(items.length > 60) items = items.slice(0,60);
 
-  // Group by DEX for clustering
-  var dexCenters = {
-    pulsex:    {x:W*0.25, y:H*0.35},
-    pulsex_v2: {x:W*0.35, y:H*0.55},
-    pulsexss:  {x:W*0.20, y:H*0.55},
-    '9mm':     {x:W*0.65, y:H*0.35},
-    '9mmv3':   {x:W*0.70, y:H*0.55},
-    '9inch':   {x:W*0.75, y:H*0.65},
-    daytona:   {x:W*0.50, y:H*0.75},
-    default:   {x:W*0.50, y:H*0.50},
+  // Cluster positions by category
+  var catPositions = {
+    'Dexes':          {x:W*0.30, y:H*0.35},
+    'Yield':          {x:W*0.65, y:H*0.30},
+    'Lending':        {x:W*0.70, y:H*0.65},
+    'Liquid Staking': {x:W*0.35, y:H*0.70},
+    'Farm':           {x:W*0.50, y:H*0.50},
+    'Bridge':         {x:W*0.20, y:H*0.60},
+    'Staking':        {x:W*0.50, y:H*0.75},
+    'default':        {x:W*0.50, y:H*0.50},
   };
 
-  bubbles = filtered.map(function(p) {
-    var dk = getDexKey(p.dexId);
-    var center = dexCenters[dk]||dexCenters.default;
-    var r = getBubbleRadius(p);
+  bubbles = items.map(function(item){
+    var cat = item.category||'default';
+    var cpos = catPositions[cat]||catPositions.default;
+    var r = getRadius(item);
     return {
-      p: p,
-      x: center.x + (Math.random()-0.5)*200,
-      y: center.y + (Math.random()-0.5)*200,
-      vx: 0, vy: 0,
+      item: item,
+      x: cpos.x + (Math.random()-0.5)*250,
+      y: cpos.y + (Math.random()-0.5)*200,
+      vx:0, vy:0,
       r: r,
-      targetX: center.x,
-      targetY: center.y,
-      color: getBubbleColor(p),
-      label: (p.baseToken&&p.baseToken.symbol||'?')+'/\n'+(p.quoteToken&&p.quoteToken.symbol||'?'),
-      dexKey: dk,
+      targetX: cpos.x,
+      targetY: cpos.y,
+      color: getColor(item),
+      isProtocol: item._isProtocol,
     };
   });
 
-  document.getElementById('si-pools').textContent = filtered.length;
+  document.getElementById('si-protos').textContent = protocols.filter(function(p){return getPulseTVL(p)>=minTVL;}).length;
+  document.getElementById('si-pools').textContent = pools.filter(function(p){return parseFloat(p.tvlUsd||0)>=minTVL;}).length;
 }
 
-// ── Physics simulation ────────────────────────────────────────────────────────
+function getItems() {
+  try {
+  if(viewMode==='protocol') {
+    return protocols.filter(function(p){return p._pulseTVL>=minTVL;}).map(function(p){
+      return {
+        id: p.slug||p.name,
+        name: p.name,
+        category: p.category||'default',
+        tvl: p._pulseTVL,
+        vol24: p._vol24,
+        apy: p._bestApy,
+        change: parseFloat(p.change_1d||0),
+        logo: p.logo||null,
+        url: 'https://defillama.com/protocol/'+(p.slug||p.name),
+        dexUrl: 'https://dexscreener.com/pulsechain',
+        pools: p._pools||[],
+        _isProtocol: true,
+      };
+    });
+  }
+  if(viewMode==='pool') {
+    return pools.filter(function(p){return parseFloat(p.tvlUsd||0)>=minTVL;}).map(function(p){
+      var sym = p.symbol||'???';
+      var parts = sym.split('-');
+      return {
+        id: p.pool,
+        name: sym,
+        category: p.project||'default',
+        tvl: parseFloat(p.tvlUsd||0),
+        vol24: p.volumeUsd7d ? p.volumeUsd7d/7 : 0,
+        apy: p.apy||0,
+        change: p.apyPct7D||0,
+        logo: null,
+        url: p.url||'https://defillama.com/yields',
+        dexUrl: 'https://dexscreener.com/pulsechain',
+        pools: [],
+        _isProtocol: false,
+        _pool: p,
+      };
+    });
+  }
+  // Both
+  var all = getItems.call({mode:'protocol'}) || [];
+  return all;
+}
+
+function getRadius(item) {
+  var val = sizeBy==='tvl' ? item.tvl :
+            sizeBy==='volume' ? item.vol24 :
+            sizeBy==='apy' ? item.apy : item.tvl;
+  if(!val||val<=0) return 8;
+  var r = Math.pow(val, 0.38) * 1.8;
+  return Math.max(10, Math.min(r, 130));
+}
+
+function getColor(item) {
+  if(colorBy==='category') return getCatColor(item.category);
+  if(colorBy==='change') {
+    var ch = item.change||0;
+    if(ch>10) return '#22C55E';
+    if(ch>0)  return '#86EFAC';
+    if(ch>-10)return '#FCA5A5';
+    return '#EF4444';
+  }
+  if(colorBy==='apy') {
+    var apy = item.apy||0;
+    if(apy>100) return '#22C55E';
+    if(apy>50)  return '#86EFAC';
+    if(apy>20)  return '#FCD34D';
+    if(apy>5)   return '#F59E0B';
+    return '#6B6880';
+  }
+  return getCatColor(item.category);
+}
+
+// ── Physics ───────────────────────────────────────────────────────────────────
+var totalEnergy = 0;
+
 function simulate() {
   var n = bubbles.length;
+  totalEnergy = 0;
 
-  for (var i=0; i<n; i++) {
-    var b = bubbles[i];
+  // Spatial grid for O(n) collision instead of O(n²)
+  var cellSize = 150;
+  var grid = {};
+  function gridKey(x,y){return Math.floor(x/cellSize)+','+Math.floor(y/cellSize);}
+  function addToGrid(b){
+    var k=gridKey(b.x,b.y);
+    if(!grid[k]) grid[k]=[];
+    grid[k].push(b);
+  }
+  bubbles.forEach(addToGrid);
 
-    // Pull toward DEX cluster center
-    b.vx += (b.targetX - b.x) * CENTER_STRENGTH;
-    b.vy += (b.targetY - b.y) * CENTER_STRENGTH;
+  for(var i=0;i<n;i++) {
+    var b=bubbles[i];
+    b.vx += (b.targetX-b.x)*0.03;
+    b.vy += (b.targetY-b.y)*0.03;
 
-    // Collision avoidance
-    for (var j=i+1; j<n; j++) {
-      var b2 = bubbles[j];
-      var dx = b.x - b2.x;
-      var dy = b.y - b2.y;
-      var dist = Math.sqrt(dx*dx+dy*dy)||1;
-      var minDist = b.r + b2.r + 3;
-      if (dist < minDist) {
-        var force = (minDist-dist)/dist * COLLIDE_STRENGTH;
-        var fx = dx*force*0.5;
-        var fy = dy*force*0.5;
-        b.vx  += fx; b.vy  += fy;
-        b2.vx -= fx; b2.vy -= fy;
+    // Only check nearby cells
+    var cx=Math.floor(b.x/cellSize), cy=Math.floor(b.y/cellSize);
+    for(var dx=-1;dx<=1;dx++){
+      for(var dy=-1;dy<=1;dy++){
+        var neighbors=grid[(cx+dx)+','+(cy+dy)]||[];
+        for(var ni=0;ni<neighbors.length;ni++){
+          var b2=neighbors[ni];
+          if(b2===b) continue;
+          var ddx=b.x-b2.x, ddy=b.y-b2.y;
+          var d=Math.sqrt(ddx*ddx+ddy*ddy)||1;
+          var md=b.r+b2.r+3;
+          if(d<md){
+            var f=(md-d)/d*0.6;
+            b.vx+=ddx*f*0.5; b.vy+=ddy*f*0.5;
+          }
+        }
       }
     }
 
-    // Damping
-    b.vx *= 0.85;
-    b.vy *= 0.85;
+    b.vx*=0.80; b.vy*=0.80;
+    b.x+=b.vx; b.y+=b.vy;
+    totalEnergy+=Math.abs(b.vx)+Math.abs(b.vy);
 
-    // Update position
-    b.x += b.vx;
-    b.y += b.vy;
-
-    // Wall bounce
-    if (b.x-b.r < 0)  { b.x = b.r;    b.vx *= -0.5; }
-    if (b.x+b.r > W)  { b.x = W-b.r;  b.vx *= -0.5; }
-    if (b.y-b.r < 0)  { b.y = b.r;    b.vy *= -0.5; }
-    if (b.y+b.r > H)  { b.y = H-b.r;  b.vy *= -0.5; }
+    if(b.x-b.r<0){b.x=b.r;b.vx*=-0.3;}
+    if(b.x+b.r>W){b.x=W-b.r;b.vx*=-0.3;}
+    if(b.y-b.r<0){b.y=b.r;b.vy*=-0.3;}
+    if(b.y+b.r>H){b.y=H-b.r;b.vy*=-0.3;}
   }
 }
 
 // ── Draw ──────────────────────────────────────────────────────────────────────
 function draw() {
-  if (!ctx) return;
-  ctx.clearRect(0, 0, W, H);
+  if(!ctx) return;
+  ctx.clearRect(0,0,W,H);
 
-  // Draw connections between bubbles sharing a token
+  // Draw connections between related bubbles
   ctx.save();
-  ctx.globalAlpha = 0.06;
-  for (var i=0; i<bubbles.length; i++) {
-    var b1 = bubbles[i];
-    var s0 = b1.p.baseToken&&b1.p.baseToken.symbol||'';
-    var s1 = b1.p.quoteToken&&b1.p.quoteToken.symbol||'';
-    for (var j=i+1; j<bubbles.length; j++) {
-      var b2 = bubbles[j];
-      var t0 = b2.p.baseToken&&b2.p.baseToken.symbol||'';
-      var t1 = b2.p.quoteToken&&b2.p.quoteToken.symbol||'';
-      // Connect if they share a token
-      if (s0===t0||s0===t1||s1===t0||s1===t1) {
-        ctx.beginPath();
-        ctx.moveTo(b1.x, b1.y);
-        ctx.lineTo(b2.x, b2.y);
-        ctx.strokeStyle = b1.color;
-        ctx.lineWidth = 0.8;
-        ctx.stroke();
+  for(var i=0;i<bubbles.length;i++){
+    var b1=bubbles[i];
+    for(var j=i+1;j<bubbles.length;j++){
+      var b2=bubbles[j];
+      // Connect same category
+      if(b1.item.category===b2.item.category){
+        var dx=b1.x-b2.x,dy=b1.y-b2.y;
+        var d=Math.sqrt(dx*dx+dy*dy);
+        if(d<300){
+          ctx.globalAlpha=0.05*(1-d/300);
+          ctx.beginPath();
+          ctx.moveTo(b1.x,b1.y);
+          ctx.lineTo(b2.x,b2.y);
+          ctx.strokeStyle=b1.color;
+          ctx.lineWidth=1;
+          ctx.stroke();
+        }
       }
     }
   }
+  ctx.globalAlpha=1;
   ctx.restore();
 
   // Draw bubbles
-  for (var i=0; i<bubbles.length; i++) {
-    var b = bubbles[i];
-    var isHovered = hoveredBubble === b;
+  for(var i=0;i<bubbles.length;i++){
+    var b=bubbles[i];
+    var hov=hoveredB===b;
 
-    // Glow for hovered
-    if (isHovered) {
-      ctx.save();
-      ctx.shadowColor = b.color;
-      ctx.shadowBlur = 20;
-    }
+    if(hov){ctx.save();ctx.shadowColor=b.color;ctx.shadowBlur=25;}
 
-    // Bubble fill
-    var grad = ctx.createRadialGradient(b.x-b.r*0.3, b.y-b.r*0.3, b.r*0.1, b.x, b.y, b.r);
-    grad.addColorStop(0, hexToRgba(b.color, 0.6));
-    grad.addColorStop(0.7, hexToRgba(b.color, 0.3));
-    grad.addColorStop(1, hexToRgba(b.color, 0.1));
-
+    // Gradient fill
+    var g=ctx.createRadialGradient(b.x-b.r*0.3,b.y-b.r*0.3,b.r*0.05,b.x,b.y,b.r);
+    g.addColorStop(0,hexRgba(b.color,hov?0.75:0.55));
+    g.addColorStop(0.6,hexRgba(b.color,hov?0.35:0.25));
+    g.addColorStop(1,hexRgba(b.color,0.05));
     ctx.beginPath();
-    ctx.arc(b.x, b.y, b.r, 0, Math.PI*2);
-    ctx.fillStyle = grad;
+    ctx.arc(b.x,b.y,b.r,0,Math.PI*2);
+    ctx.fillStyle=g;
     ctx.fill();
 
     // Border
     ctx.beginPath();
-    ctx.arc(b.x, b.y, b.r, 0, Math.PI*2);
-    ctx.strokeStyle = hexToRgba(b.color, isHovered?0.9:0.4);
-    ctx.lineWidth = isHovered ? 2 : 1;
+    ctx.arc(b.x,b.y,b.r,0,Math.PI*2);
+    ctx.strokeStyle=hexRgba(b.color,hov?1:0.5);
+    ctx.lineWidth=hov?2:1;
     ctx.stroke();
 
-    if (isHovered) ctx.restore();
+    if(hov) ctx.restore();
 
-    // Label (only if bubble is big enough)
-    if (b.r > 22) {
+    // Protocol inner ring for protocol bubbles
+    if(b.isProtocol && b.r>30) {
+      ctx.beginPath();
+      ctx.arc(b.x,b.y,b.r*0.85,0,Math.PI*2);
+      ctx.strokeStyle=hexRgba(b.color,0.15);
+      ctx.lineWidth=1;
+      ctx.stroke();
+    }
+
+    // Labels
+    if(b.r>18) {
       ctx.save();
-      ctx.fillStyle = 'rgba(241,240,255,'+(isHovered?0.95:0.75)+')';
-      ctx.font = 'bold '+(Math.min(b.r*0.28,13))+'px -apple-system,sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      var parts = b.label.split('\n');
-      if (parts.length===2 && b.r>30) {
-        ctx.fillText(parts[0], b.x, b.y-b.r*0.15);
-        ctx.font = (Math.min(b.r*0.22,10))+'px -apple-system,sans-serif';
-        ctx.fillStyle = 'rgba(149,146,168,0.8)';
-        ctx.fillText(parts[1], b.x, b.y+b.r*0.2);
+      var fs=Math.min(b.r*0.28,14);
+      ctx.font='600 '+fs+'px -apple-system,sans-serif';
+      ctx.textAlign='center';
+      ctx.textBaseline='middle';
+      ctx.fillStyle='rgba(241,240,255,'+(hov?0.95:0.8)+')';
+      var label=b.item.name;
+      if(label.length>10 && b.r<50) label=label.slice(0,8)+'..';
+      if(b.r>40) {
+        ctx.fillText(label,b.x,b.y-b.r*0.12);
+        ctx.font=(Math.min(b.r*0.2,10))+'px Courier New,monospace';
+        ctx.fillStyle='rgba(149,146,168,0.75)';
+        ctx.fillText(fmt(b.item.tvl),b.x,b.y+b.r*0.22);
       } else {
-        ctx.fillText(parts[0], b.x, b.y);
-      }
-
-      // TVL label for big bubbles
-      if (b.r > 50) {
-        var tvl = parseFloat(b.p.liquidity&&b.p.liquidity.usd||0);
-        ctx.font = (Math.min(b.r*0.18,10))+'px Courier New,monospace';
-        ctx.fillStyle = 'rgba(149,146,168,0.7)';
-        ctx.fillText(fmt(tvl), b.x, b.y+b.r*0.45);
+        ctx.fillText(label,b.x,b.y);
       }
       ctx.restore();
     }
   }
 
-  // DEX cluster labels
-  drawDexLabels();
+  // Category labels
+  drawCatLabels();
 }
 
-function drawDexLabels() {
-  // Find centroid of each DEX group
-  var groups = {};
+function drawCatLabels() {
+  var cats={};
   bubbles.forEach(function(b){
-    if (!groups[b.dexKey]) groups[b.dexKey]={x:0,y:0,n:0,color:b.color};
-    groups[b.dexKey].x += b.x;
-    groups[b.dexKey].y += b.y;
-    groups[b.dexKey].n++;
+    var c=b.item.category||'default';
+    if(!cats[c]) cats[c]={x:0,y:0,n:0,color:b.color,minY:9999};
+    cats[c].x+=b.x; cats[c].y+=b.y; cats[c].n++;
+    if(b.y-b.r < cats[c].minY) cats[c].minY=b.y-b.r;
   });
-
   ctx.save();
-  Object.keys(groups).forEach(function(k){
-    var g = groups[k];
-    if (g.n < 1) return;
-    var cx = g.x/g.n;
-    var cy = g.y/g.n - 60; // above the cluster
-
-    // Find topmost bubble in cluster
-    var topY = Math.min.apply(null, bubbles.filter(function(b){return b.dexKey===k;}).map(function(b){return b.y-b.r;}));
-
-    ctx.font = 'bold 11px -apple-system,sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = hexToRgba(g.color, 0.7);
-    ctx.fillText(DEX_LABELS[k]||k, cx, topY-10);
+  Object.keys(cats).forEach(function(cat){
+    var g=cats[cat];
+    if(g.n<1||cat==='default') return;
+    ctx.font='bold 11px -apple-system,sans-serif';
+    ctx.textAlign='center';
+    ctx.fillStyle=hexRgba(g.color,0.65);
+    ctx.fillText(cat, g.x/g.n, g.minY-14);
   });
   ctx.restore();
 }
 
-// ── Animation loop ────────────────────────────────────────────────────────────
-var simSteps = 0;
+// ── Animation ─────────────────────────────────────────────────────────────────
 function startSim() {
-  simSteps = 0;
-  function loop() {
-    // Run physics for first 300 frames, then slow down
-    if (simSteps < 300) {
+  simSteps=0;
+  var settled = false;
+  function loop(){
+    // Keep simulating until energy is low (bubbles stopped moving)
+    if(!settled) {
       simulate();
-      simSteps++;
-    } else if (simSteps < 600) {
-      // Slow physics
-      if (simSteps % 3 === 0) simulate();
-      simSteps++;
+      if(totalEnergy < bubbles.length * 0.05 && simSteps > 30) {
+        settled = true;
+      }
+    } else if(hoveredB) {
+      // Only simulate when hovering (for hover glow effect)
+      simulate();
     }
+    simSteps++;
     draw();
-    animFrame = requestAnimationFrame(loop);
+    // Slow down to 30fps once settled - saves CPU
+    if(settled && !hoveredB) {
+      animFrame = setTimeout(function(){
+        animFrame = requestAnimationFrame(loop);
+      }, 33);
+    } else {
+      animFrame = requestAnimationFrame(loop);
+    }
   }
-  animFrame = requestAnimationFrame(loop);
+  animFrame=requestAnimationFrame(loop);
 }
 
 // ── Interaction ───────────────────────────────────────────────────────────────
-function getHoveredBubble(mx, my) {
-  for (var i=bubbles.length-1; i>=0; i--) {
-    var b = bubbles[i];
-    var dx = mx-b.x, dy = my-b.y;
-    if (dx*dx+dy*dy <= b.r*b.r) return b;
+function getBubbleAt(mx,my) {
+  for(var i=bubbles.length-1;i>=0;i--){
+    var b=bubbles[i];
+    var dx=mx-b.x,dy=my-b.y;
+    if(dx*dx+dy*dy<=b.r*b.r) return b;
   }
   return null;
 }
 
-canvas.addEventListener('mousemove', function(e) {
-  var rect = canvas.getBoundingClientRect();
-  var mx = e.clientX-rect.left;
-  var my = e.clientY-rect.top;
-  var b = getHoveredBubble(mx*W/rect.width, my*H/rect.height);
-  hoveredBubble = b;
-  canvas.style.cursor = b ? 'pointer' : 'default';
+canvas.addEventListener('mousemove',function(e){
+  var rect=canvas.getBoundingClientRect();
+  var mx=(e.clientX-rect.left)*W/rect.width;
+  var my=(e.clientY-rect.top)*H/rect.height;
+  var b=getBubbleAt(mx,my);
+  hoveredB=b;
+  canvas.style.cursor=b?'pointer':'default';
 
-  var tt = document.getElementById('tooltip');
-  if (b) {
-    var p = b.p;
-    var s0 = p.baseToken&&p.baseToken.symbol||'?';
-    var s1 = p.quoteToken&&p.quoteToken.symbol||'?';
-    var tvl = parseFloat(p.liquidity&&p.liquidity.usd||0);
-    var vol = parseFloat(p.volume&&p.volume.h24||0);
-    var apr = calcAPR(p);
-    var ch  = parseFloat(p.priceChange&&p.priceChange.h24||0);
-    var dk  = getDexKey(p.dexId);
-    var logo = p.info&&p.info.imageUrl;
+  var tt=document.getElementById('tooltip');
+  if(b){
+    var it=b.item;
+    document.getElementById('tt-logo').innerHTML = it.logo ?
+      '<img src="'+it.logo+'" onerror="this.parentElement.textContent=\''+it.name.slice(0,3)+'\'">' :
+      it.name.slice(0,3);
+    document.getElementById('tt-name').textContent=it.name;
+    document.getElementById('tt-sub').textContent=(it.category||'')+(it._isProtocol?' · Protocol':' · Pool');
+    document.getElementById('tt-tvl').textContent=fmt(it.tvl);
+    document.getElementById('tt-vol').textContent=it.vol24>0?fmt(it.vol24):'—';
+    document.getElementById('tt-apy').textContent=it.apy>0?it.apy.toFixed(1)+'%':'—';
+    var chEl=document.getElementById('tt-chg');
+    chEl.textContent=fmtPct(it.change);
+    chEl.className='tt-val '+(it.change>=0?'green':'red');
 
-    document.getElementById('tt-icon').innerHTML = logo ?
-      '<img src="'+logo+'" onerror="this.parentElement.textContent=\''+s0.slice(0,3)+'\'">':
-      s0.slice(0,3);
-    document.getElementById('tt-name').textContent = s0+' / '+s1;
-    document.getElementById('tt-dex').textContent  = DEX_LABELS[dk]||dk;
-    document.getElementById('tt-tvl').textContent  = fmt(tvl);
-    document.getElementById('tt-vol').textContent  = fmt(vol);
-    document.getElementById('tt-apr').textContent  = apr.toFixed(1)+'%';
-    var chEl = document.getElementById('tt-chg');
-    chEl.textContent = (ch>=0?'+':'')+ch.toFixed(1)+'%';
-    chEl.className = 'tt-stat-val '+(ch>=0?'green':'red');
+    // Show top pools if protocol
+    var poolsHtml='';
+    if(it.pools&&it.pools.length>0) {
+      poolsHtml='<div style="font-size:10px;color:var(--muted);margin-bottom:4px;">Top Pools:</div>';
+      it.pools.slice(0,5).forEach(function(p){
+        poolsHtml+='<div class="tt-pool-row"><span style="color:var(--text);">'+( p.symbol||'?')+'</span><span style="color:var(--green);">'+(p.apy?(p.apy.toFixed(1)+'% APY'):'—')+'</span><span style="color:var(--muted);">'+fmt(p.tvlUsd)+'</span></div>';
+      });
+    }
+    document.getElementById('tt-pools').innerHTML=poolsHtml;
 
-    var addUrl = (DEX_ADD_URLS[dk]||DEX_ADD_URLS.default)+(p.baseToken&&p.baseToken.address||'')+'/'+(p.quoteToken&&p.quoteToken.address||'');
-    document.getElementById('tt-dex-link').href = addUrl;
-    document.getElementById('tt-chart-link').href = 'https://dexscreener.com/pulsechain/'+(p.pairAddress||'');
+    document.getElementById('tt-link1').href=it.url||'#';
+    document.getElementById('tt-link1').textContent=it._isProtocol?'DefiLlama ↗':'Pool ↗';
+    document.getElementById('tt-link2').href=it.dexUrl||'#';
 
     // Position tooltip
-    var tx = e.clientX+16, ty = e.clientY-10;
-    var ttW = 240, ttH = 160;
-    if (tx+ttW > window.innerWidth) tx = e.clientX-ttW-16;
-    if (ty+ttH > window.innerHeight) ty = e.clientY-ttH-10;
-    tt.style.left = tx+'px';
-    tt.style.top  = ty+'px';
-    tt.style.display = 'block';
+    var tx=e.clientX+16,ty=e.clientY-10;
+    if(tx+260>window.innerWidth) tx=e.clientX-276;
+    if(ty+220>window.innerHeight) ty=e.clientY-220;
+    tt.style.left=tx+'px'; tt.style.top=ty+'px';
+    tt.style.display='block';
   } else {
-    tt.style.display = 'none';
+    tt.style.display='none';
   }
 });
 
-canvas.addEventListener('click', function(e) {
-  var rect = canvas.getBoundingClientRect();
-  var mx = e.clientX-rect.left;
-  var my = e.clientY-rect.top;
-  var b = getHoveredBubble(mx*W/rect.width, my*H/rect.height);
-  if (b) {
-    window.open('https://dexscreener.com/pulsechain/'+(b.p.pairAddress||''), '_blank');
-  }
+canvas.addEventListener('click',function(e){
+  var rect=canvas.getBoundingClientRect();
+  var mx=(e.clientX-rect.left)*W/rect.width;
+  var my=(e.clientY-rect.top)*H/rect.height;
+  var b=getBubbleAt(mx,my);
+  if(b) window.open(b.item.url||'#','_blank');
 });
 
-canvas.addEventListener('mouseleave', function(){
-  hoveredBubble = null;
-  document.getElementById('tooltip').style.display = 'none';
+canvas.addEventListener('mouseleave',function(){
+  hoveredB=null;
+  document.getElementById('tooltip').style.display='none';
 });
 
-// ── Resize ────────────────────────────────────────────────────────────────────
-function resize() {
-  var wrap = canvas.parentElement;
-  W = canvas.width  = wrap.clientWidth;
-  H = canvas.height = wrap.clientHeight;
+// ── Controls ──────────────────────────────────────────────────────────────────
+function setSizeBy(v,el){sizeBy=v;tog(el);bubbles.forEach(function(b){b.r=getRadius(b.item);});simSteps=0;}
+function setColorBy(v,el){colorBy=v;tog(el);bubbles.forEach(function(b){b.color=getColor(b.item);});updateLegend();}
+function setMinTVL(v,el){minTVL=v;tog(el);if(animFrame)cancelAnimationFrame(animFrame);buildBubbles();startSim();updateStats();}
+function setView(v,el){
+  viewMode=v;tog(el);
+  var info=document.getElementById('view-info');
+  if(v==='protocol') info.innerHTML='<strong style="color:var(--text);">Protocol View</strong><br>Each bubble = one protocol.<br>Hover for pool breakdown.<br>Click to open on DefiLlama.';
+  else if(v==='pool') info.innerHTML='<strong style="color:var(--text);">Pool View</strong><br>Each bubble = one LP pool.<br>Sized by TVL.<br>Click to view on DefiLlama.';
+  else info.innerHTML='<strong style="color:var(--text);">Combined View</strong><br>Protocols + individual pools.<br>Hover to explore.';
+  if(animFrame)cancelAnimationFrame(animFrame);
+  buildBubbles();startSim();
 }
-window.addEventListener('resize', function(){
-  resize();
-  if (pools.length) buildBubbles();
-});
+function tog(el){el.parentElement.querySelectorAll('.cbtn').forEach(function(b){b.classList.remove('active');});el.classList.add('active');}
 
-// ── Control handlers ──────────────────────────────────────────────────────────
-function setSizeBy(v,el) {
-  sizeBy=v;
-  toggleActive(el);
-  // Update radii in place - smooth transition
-  bubbles.forEach(function(b){
-    var newR = getBubbleRadius(b.p);
-    b.r = newR;
-  });
-  // Restart sim briefly to resolve any overlaps
-  simSteps = 0;
-}
-
-function setColorBy(v,el) {
-  colorBy=v;
-  toggleActive(el);
-  bubbles.forEach(function(b){b.color=getBubbleColor(b.p);});
-  updateLegend();
-  // No sim restart needed - just color change
-}
-
-function setMinLiq(v,el) {
-  minLiq=v;
-  toggleActive(el);
-  // Rebuild bubbles but keep animation running smoothly
-  if (animFrame) cancelAnimationFrame(animFrame);
-  buildBubbles();
-  startSim();
-  updateInlineStats();
-}
-function toggleActive(el) {
-  el.parentElement.querySelectorAll('.cbtn').forEach(function(b){b.classList.remove('active');});
-  el.classList.add('active');
+function updateStats() {
+  var protos=protocols.filter(function(p){return p._pulseTVL>=minTVL;});
+  var ps=pools.filter(function(p){return parseFloat(p.tvlUsd||0)>=minTVL;});
+  var totalTVL=protos.reduce(function(s,p){return s+p._pulseTVL;},0);
+  document.getElementById('si-protos').textContent=protos.length;
+  document.getElementById('si-pools').textContent=ps.length;
+  document.getElementById('si-tvl').textContent=fmt(totalTVL);
 }
 
 function updateLegend() {
-  var leg = document.getElementById('legend');
-  if (colorBy==='dex') {
-    leg.innerHTML = '<div class="legend-title">DEX</div>' +
-      '<div class="legend-item"><div class="legend-dot" style="background:#3B82F6;"></div>PulseX V1</div>' +
-      '<div class="legend-item"><div class="legend-dot" style="background:#9D4EDD;"></div>PulseX V2</div>' +
-      '<div class="legend-item"><div class="legend-dot" style="background:#F59E0B;"></div>9mm</div>' +
-      '<div class="legend-item"><div class="legend-dot" style="background:#EF4444;"></div>9inch</div>' +
-      '<div class="legend-item"><div class="legend-dot" style="background:#22C55E;"></div>Other</div>';
-  } else if (colorBy==='change') {
-    leg.innerHTML = '<div class="legend-title">24h Change</div>' +
-      '<div class="legend-item"><div class="legend-dot" style="background:#22C55E;"></div>>+10%</div>' +
-      '<div class="legend-item"><div class="legend-dot" style="background:#86EFAC;"></div>0 to +10%</div>' +
-      '<div class="legend-item"><div class="legend-dot" style="background:#FCA5A5;"></div>0 to -10%</div>' +
-      '<div class="legend-item"><div class="legend-dot" style="background:#EF4444;"></div><-10%</div>';
+  var leg=document.getElementById('legend');
+  if(colorBy==='category'){
+    leg.innerHTML='<div class="leg-title">Category</div>'+
+      Object.keys(CAT_COLORS).filter(function(k){return k!=='default';}).map(function(k){
+        return '<div class="leg-item"><div class="leg-dot" style="background:'+CAT_COLORS[k]+';"></div>'+k+'</div>';
+      }).join('');
+  } else if(colorBy==='change'){
+    leg.innerHTML='<div class="leg-title">24h Change</div>'+
+      '<div class="leg-item"><div class="leg-dot" style="background:#22C55E;"></div>>+10%</div>'+
+      '<div class="leg-item"><div class="leg-dot" style="background:#86EFAC;"></div>0 to +10%</div>'+
+      '<div class="leg-item"><div class="leg-dot" style="background:#FCA5A5;"></div>0 to -10%</div>'+
+      '<div class="leg-item"><div class="leg-dot" style="background:#EF4444;"></div><-10%</div>';
   } else {
-    leg.innerHTML = '<div class="legend-title">Est. APR</div>' +
-      '<div class="legend-item"><div class="legend-dot" style="background:#22C55E;"></div>>100%</div>' +
-      '<div class="legend-item"><div class="legend-dot" style="background:#86EFAC;"></div>50-100%</div>' +
-      '<div class="legend-item"><div class="legend-dot" style="background:#FCD34D;"></div>20-50%</div>' +
-      '<div class="legend-item"><div class="legend-dot" style="background:#F59E0B;"></div>5-20%</div>' +
-      '<div class="legend-item"><div class="legend-dot" style="background:#6B6880;"></div><5%</div>';
+    leg.innerHTML='<div class="leg-title">APY</div>'+
+      '<div class="leg-item"><div class="leg-dot" style="background:#22C55E;"></div>>100%</div>'+
+      '<div class="leg-item"><div class="leg-dot" style="background:#86EFAC;"></div>50-100%</div>'+
+      '<div class="leg-item"><div class="leg-dot" style="background:#FCD34D;"></div>20-50%</div>'+
+      '<div class="leg-item"><div class="leg-dot" style="background:#F59E0B;"></div>5-20%</div>'+
+      '<div class="leg-item"><div class="leg-dot" style="background:#6B6880;"></div><5%</div>';
   }
 }
 
-function updateInlineStats() {
-  var filtered = pools.filter(function(p){return parseFloat(p.liquidity&&p.liquidity.usd||0)>=minLiq;});
-  var totalTVL = filtered.reduce(function(s,p){return s+parseFloat(p.liquidity&&p.liquidity.usd||0);},0);
-  var totalVol = filtered.reduce(function(s,p){return s+parseFloat(p.volume&&p.volume.h24||0);},0);
-  document.getElementById('si-tvl').textContent = fmt(totalTVL);
-  document.getElementById('si-vol').textContent = fmt(totalVol);
+// ── Resize ────────────────────────────────────────────────────────────────────
+function resize(){
+  var wrap=canvas.parentElement;
+  W=canvas.width=wrap.clientWidth;
+  H=canvas.height=wrap.clientHeight;
 }
+window.addEventListener('resize',function(){resize();if(bubbles.length)buildBubbles();});
 
 // ── Hex to rgba ───────────────────────────────────────────────────────────────
-function hexToRgba(hex, alpha) {
+function hexRgba(hex,a){
   var r=parseInt(hex.slice(1,3),16);
   var g=parseInt(hex.slice(3,5),16);
   var b=parseInt(hex.slice(5,7),16);
-  return 'rgba('+r+','+g+','+b+','+alpha+')';
+  return 'rgba('+r+','+g+','+b+','+a+')';
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
+canvas=document.getElementById('bubble-canvas');
+ctx=canvas.getContext('2d');
 resize();
-loadData();
-// Full reload every 2 minutes
-setInterval(loadData, 120000);
-// Lightweight color/size update every 30 seconds
-setInterval(function(){
-  if (bubbles.length > 0) {
-    bubbles.forEach(function(b){
-      b.color = getBubbleColor(b.p);
-      // Gently pulse size
-      b.r = getBubbleRadius(b.p);
-    });
+updateLegend();
+
+// Show loading bar immediately on page load
+var loadingEl = document.getElementById('loading');
+loadingEl.style.display='flex';
+setProgress(2,'Initialising...','');
+
+// Use sessionStorage to cache protocol data for instant reload
+async function loadCached() {
+  var cached = sessionStorage.getItem('pulse_protocols');
+  var cachedAge = sessionStorage.getItem('pulse_cache_time');
+  var now = Date.now();
+  
+  // Use cache if less than 2 minutes old
+  if(cached && cachedAge && (now - parseInt(cachedAge)) < 120000) {
+    try {
+      protocols = JSON.parse(cached);
+      setProgress(40,'Using cached data...','');
+      matchPoolsToProtocols();
+      buildBubbles();
+      document.getElementById('loading').style.display='none';
+      updateStats();
+      updateLegend();
+      startSim();
+      // Still fetch fresh data in background
+      loadData(true);
+      return;
+    } catch(e) {}
   }
-}, 30000);
+  loadData(false);
+}
+
+// Use rAF to ensure loading bar renders before fetch starts
+requestAnimationFrame(function(){
+  setTimeout(loadCached, 50);
+});
+setInterval(function(){ loadData(false); }, 120000);
 </script>
 </body>
 </html>
