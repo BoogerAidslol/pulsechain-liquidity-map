@@ -609,20 +609,19 @@ function startSim() {
   simSteps=0;
   var settled = false;
   function loop(){
-    // Keep simulating until energy is low (bubbles stopped moving)
     if(!settled) {
       simulate();
-      if(totalEnergy < bubbles.length * 0.05 && simSteps > 30) {
+      if(totalEnergy < bubbles.length * 0.08 && simSteps > 50) {
         settled = true;
+        // Freeze all velocities when settled
+        bubbles.forEach(function(b){ b.vx=0; b.vy=0; });
       }
-    } else if(hoveredB) {
-      // Only simulate when hovering (for hover glow effect)
-      simulate();
     }
+    // Never simulate again once settled unless filter changes
     simSteps++;
     draw();
-    // Slow down to 30fps once settled - saves CPU
-    if(settled && !hoveredB) {
+    // 30fps once settled
+    if(settled) {
       animFrame = setTimeout(function(){
         animFrame = requestAnimationFrame(loop);
       }, 33);
@@ -705,7 +704,7 @@ canvas.addEventListener('mouseleave',function(){
 });
 
 // ── Controls ──────────────────────────────────────────────────────────────────
-function setSizeBy(v,el){sizeBy=v;tog(el);bubbles.forEach(function(b){b.r=getRadius(b.item);});simSteps=0;}
+function setSizeBy(v,el){sizeBy=v;tog(el);bubbles.forEach(function(b){b.r=getRadius(b.item);});simSteps=0;if(animFrame)cancelAnimationFrame(animFrame);startSim();}
 function setColorBy(v,el){colorBy=v;tog(el);bubbles.forEach(function(b){b.color=getColor(b.item);});updateLegend();}
 function setMinTVL(v,el){minTVL=v;tog(el);if(animFrame)cancelAnimationFrame(animFrame);buildBubbles();startSim();updateStats();}
 function setView(v,el){
@@ -781,9 +780,15 @@ updateLegend();
 resize();
 document.getElementById('loading').style.display='flex';
 setProgress(2,'Initialising...','');
-// Wait for paint then load
 setTimeout(function(){ loadData(false); }, 80);
 setInterval(function(){ loadData(false); }, 120000);
+
+// Expose functions needed by HTML onclick handlers
+window.setSizeBy  = setSizeBy;
+window.setColorBy = setColorBy;
+window.setView    = setView;
+window.setMinTVL  = setMinTVL;
+window.loadData   = function(){ loadData(false); };
 
 });
 </script>
