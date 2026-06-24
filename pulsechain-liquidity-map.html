@@ -609,22 +609,20 @@ function startSim() {
   simSteps=0;
   var settled = false;
   function loop(){
-    if(!settled) {
+    // Hard stop after 120 frames no matter what
+    if(simSteps < 120) {
       simulate();
-      if(totalEnergy < bubbles.length * 0.08 && simSteps > 50) {
-        settled = true;
-        // Freeze all velocities when settled
-        bubbles.forEach(function(b){ b.vx=0; b.vy=0; });
-      }
+    } else if(!settled) {
+      settled = true;
+      bubbles.forEach(function(b){ b.vx=0; b.vy=0; });
     }
-    // Never simulate again once settled unless filter changes
     simSteps++;
     draw();
-    // 30fps once settled
+    // Once settled drop to 20fps static redraw only
     if(settled) {
       animFrame = setTimeout(function(){
         animFrame = requestAnimationFrame(loop);
-      }, 33);
+      }, 50);
     } else {
       animFrame = requestAnimationFrame(loop);
     }
