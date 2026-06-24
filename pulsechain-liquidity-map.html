@@ -75,7 +75,7 @@ header{border-bottom:1px solid var(--border);padding:12px 20px;display:flex;alig
   <div class="logo"><div class="logo-icon">🫧</div> PulseChain Liquidity Map</div>
   <div class="hright">
     <div class="live-badge"><div class="live-dot"></div> LIVE</div>
-    <button class="btn" onclick="loadData()">↻ Refresh</button>
+    <button class="btn" onclick="loadData(false)">↻ Refresh</button>
   </div>
 </header>
 
@@ -361,7 +361,6 @@ function buildBubbles() {
 }
 
 function getItems() {
-  try {
   if(viewMode==='protocol') {
     return protocols.filter(function(p){return p._pulseTVL>=minTVL;}).map(function(p){
       return {
