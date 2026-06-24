@@ -747,9 +747,13 @@ function updateLegend() {
 
 // ── Resize ────────────────────────────────────────────────────────────────────
 function resize(){
+  if(!canvas) { canvas=document.getElementById('bubble-canvas'); }
+  if(!canvas) return;
   var wrap=canvas.parentElement;
+  if(!wrap) return;
   W=canvas.width=wrap.clientWidth;
   H=canvas.height=wrap.clientHeight;
+  if(!ctx) ctx=canvas.getContext('2d');
 }
 window.addEventListener('resize',function(){resize();if(bubbles.length)buildBubbles();});
 
@@ -768,6 +772,9 @@ resize();
 updateLegend();
 
 // ── Simple init ──────────────────────────────────────────────────────────────
+canvas = document.getElementById('bubble-canvas');
+ctx = canvas ? canvas.getContext('2d') : null;
+resize();
 document.getElementById('loading').style.display='flex';
 setProgress(2,'Initialising...','');
 // Wait for paint then load
