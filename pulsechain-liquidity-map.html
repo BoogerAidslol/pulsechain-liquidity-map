@@ -238,24 +238,6 @@ async function loadData(background) {
   }
   setProgress(10,'Loading PulseChain protocols...','');
 
-  // Check cache first
-  var cached = sessionStorage.getItem('pulse_protocols');
-  var cachedAge = sessionStorage.getItem('pulse_cache_time');
-  var now = Date.now();
-  if(cached && cachedAge && (now-parseInt(cachedAge))<120000) {
-    try {
-      protocols = JSON.parse(cached);
-      setProgress(60,'Using cached data...','');
-      matchPoolsToProtocols();
-      buildBubbles();
-      document.getElementById('loading').style.display='none';
-      updateStats(); updateLegend(); startSim();
-      // Refresh in background
-      setTimeout(function(){ loadData(true); }, 1000);
-      return;
-    } catch(e){}
-  }
-
   // Seed with hardcoded protocols immediately for instant display
   protocols = PULSE_PROTOCOLS_SEED.map(function(p){
     return {
@@ -786,40 +768,11 @@ ctx=canvas.getContext('2d');
 resize();
 updateLegend();
 
-// Show loading bar immediately on page load
-var loadingEl = document.getElementById('loading');
-loadingEl.style.display='flex';
+// ── Simple init ──────────────────────────────────────────────────────────────
+document.getElementById('loading').style.display='flex';
 setProgress(2,'Initialising...','');
-
-// Use sessionStorage to cache protocol data for instant reload
-async function loadCached() {
-  var cached = sessionStorage.getItem('pulse_protocols');
-  var cachedAge = sessionStorage.getItem('pulse_cache_time');
-  var now = Date.now();
-  
-  // Use cache if less than 2 minutes old
-  if(cached && cachedAge && (now - parseInt(cachedAge)) < 120000) {
-    try {
-      protocols = JSON.parse(cached);
-      setProgress(40,'Using cached data...','');
-      matchPoolsToProtocols();
-      buildBubbles();
-      document.getElementById('loading').style.display='none';
-      updateStats();
-      updateLegend();
-      startSim();
-      // Still fetch fresh data in background
-      loadData(true);
-      return;
-    } catch(e) {}
-  }
-  loadData(false);
-}
-
-// Use rAF to ensure loading bar renders before fetch starts
-requestAnimationFrame(function(){
-  setTimeout(loadCached, 50);
-});
+// Wait for paint then load
+setTimeout(function(){ loadData(false); }, 80);
 setInterval(function(){ loadData(false); }, 120000);
 </script>
 </body>
