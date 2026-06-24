@@ -212,53 +212,94 @@ function setProgress(pct,text,sub) {
 }
 
 // ── Data fetching ─────────────────────────────────────────────────────────────
+// Hardcoded PulseChain protocols - instant load, no API needed
+var PULSE_PROTOCOLS_SEED = [
+  {name:'PulseX',       slug:'pulsex',        category:'Dexes',          tvl:0, change_1d:0, logo:'https://icons.llamao.fi/icons/protocols/pulsex'},
+  {name:'9mm',          slug:'9mm',            category:'Dexes',          tvl:0, change_1d:0, logo:'https://icons.llamao.fi/icons/protocols/9mm'},
+  {name:'9inch',        slug:'9inch',          category:'Dexes',          tvl:0, change_1d:0, logo:'https://icons.llamao.fi/icons/protocols/9inch'},
+  {name:'Phux',         slug:'phux',           category:'Yield',          tvl:0, change_1d:0, logo:'https://icons.llamao.fi/icons/protocols/phux'},
+  {name:'Sparkswap',    slug:'sparkswap',      category:'Dexes',          tvl:0, change_1d:0, logo:'https://icons.llamao.fi/icons/protocols/sparkswap'},
+  {name:'HEX',          slug:'hex',            category:'Staking',        tvl:0, change_1d:0, logo:'https://icons.llamao.fi/icons/protocols/hex'},
+  {name:'Daytona',      slug:'daytona',        category:'Dexes',          tvl:0, change_1d:0, logo:'https://icons.llamao.fi/icons/protocols/daytona'},
+  {name:'Inception',    slug:'inception-pulse',category:'Liquid Staking', tvl:0, change_1d:0, logo:'https://icons.llamao.fi/icons/protocols/inception'},
+  {name:'Atrofarm',     slug:'atrofarm',       category:'Farm',           tvl:0, change_1d:0, logo:'https://icons.llamao.fi/icons/protocols/atrofarm'},
+  {name:'ChirpFinance', slug:'chirpfinance',   category:'Lending',        tvl:0, change_1d:0, logo:'https://icons.llamao.fi/icons/protocols/chirpfinance'},
+  {name:'YieldPulse',   slug:'yieldpulse',     category:'Yield',          tvl:0, change_1d:0, logo:null},
+  {name:'PulseGun',     slug:'pulsegun',       category:'Farm',           tvl:0, change_1d:0, logo:null},
+  {name:'ColaFactory',  slug:'colafactory',    category:'Dexes',          tvl:0, change_1d:0, logo:null},
+  {name:'FlashPulse',   slug:'flashpulse',     category:'Yield',          tvl:0, change_1d:0, logo:null},
+];
+
 async function loadData(background) {
   if(!background) {
     document.getElementById('loading').style.display='flex';
     if(animFrame) cancelAnimationFrame(animFrame);
     protocols=[];pools=[];dexPairs=[];
   }
-  setProgress(10,'Fetching PulseChain protocols...','Connecting to DefiLlama');
+  setProgress(10,'Loading PulseChain protocols...','');
 
-  // ONLY fetch protocols - fast, ~200KB, no hang
+  // Check cache first
+  var cached = sessionStorage.getItem('pulse_protocols');
+  var cachedAge = sessionStorage.getItem('pulse_cache_time');
+  var now = Date.now();
+  if(cached && cachedAge && (now-parseInt(cachedAge))<120000) {
+    try {
+      protocols = JSON.parse(cached);
+      setProgress(60,'Using cached data...','');
+      matchPoolsToProtocols();
+      buildBubbles();
+      document.getElementById('loading').style.display='none';
+      updateStats(); updateLegend(); startSim();
+      // Refresh in background
+      setTimeout(function(){ loadData(true); }, 1000);
+      return;
+    } catch(e){}
+  }
+
+  // Seed with hardcoded protocols immediately for instant display
+  protocols = PULSE_PROTOCOLS_SEED.map(function(p){
+    return {
+      name: p.name, slug: p.slug, category: p.category,
+      logo: p.logo, change_1d: p.change_1d,
+      chains: ['Pulsechain'],
+      currentChainTvls: {'Pulsechain': p.tvl},
+      _pools:[], _pulseTVL: p.tvl||1000000, _vol24:0, _bestApy:0,
+    };
+  });
+
+  setProgress(40,'Rendering map...','');
+  matchPoolsToProtocols();
+  buildBubbles();
+  document.getElementById('loading').style.display='none';
+  updateStats(); updateLegend(); startSim();
+
+  // Now fetch real TVL data in background
+  setProgress(50,'Fetching live TVL...','');
   try {
     var ctrl = new AbortController();
-    var timer = setTimeout(function(){ctrl.abort();}, 12000);
-    var r = await fetch(LLAMA_PROTOS, {signal:ctrl.signal});
+    var timer = setTimeout(function(){ctrl.abort();}, 15000);
+    var r = await fetch('https://api.llama.fi/protocols', {signal:ctrl.signal});
     clearTimeout(timer);
     if(r.ok) {
       var j = await r.json();
-      protocols = j.filter(function(p){
+      var pulseProtos = j.filter(function(p){
         if(!p.chains) return false;
-        var onPulse = p.chains.some(function(c){return c.toLowerCase().includes('pulse');});
-        if(!onPulse) return false;
-        return getPulseTVL(p) >= 100;
+        return p.chains.some(function(ch){return ch.toLowerCase().includes('pulse');});
       });
-      protocols.sort(function(a,b){return getPulseTVL(b)-getPulseTVL(a);});
-      // Cache it
-      try {
-        sessionStorage.setItem('pulse_protocols', JSON.stringify(protocols));
-        sessionStorage.setItem('pulse_cache_time', Date.now().toString());
-      } catch(e){}
-      console.log('Protocols:', protocols.length);
+      if(pulseProtos.length > 0) {
+        protocols = pulseProtos.filter(function(p){return getPulseTVL(p)>=100;});
+        protocols.sort(function(a,b){return getPulseTVL(b)-getPulseTVL(a);});
+        try {
+          sessionStorage.setItem('pulse_protocols', JSON.stringify(protocols));
+          sessionStorage.setItem('pulse_cache_time', Date.now().toString());
+        } catch(e){}
+        matchPoolsToProtocols();
+        buildBubbles();
+        updateStats(); updateLegend();
+        simSteps=0; // restart sim with new data
+      }
     }
-  } catch(e){ console.log('Protocol fetch failed:', e.message); }
-
-  setProgress(70,'Building map...','Processing '+protocols.length+' protocols');
-  
-  try { matchPoolsToProtocols(); } catch(e){ console.error('matchPools error:',e); }
-  setProgress(80,'Rendering bubbles...','');
-
-  if(protocols.length > 0) {
-    if(!background) {
-      try { buildBubbles(); } catch(e){ console.error('buildBubbles error:',e); showErr('buildBubbles failed: '+e.message); return; }
-      setProgress(90,'Starting animation...','');
-      document.getElementById('loading').style.display='none';
-      try { updateStats(); } catch(e){ console.error('updateStats error:',e); }
-      try { updateLegend(); } catch(e){ console.error('updateLegend error:',e); }
-      try { startSim(); } catch(e){ console.error('startSim error:',e); showErr('startSim failed: '+e.message); return; }
-    }
-  }
+  } catch(e){ console.log('Background TVL fetch:', e.message); }
 
     if(protocols.length === 0) {
     document.getElementById('loading').innerHTML =
