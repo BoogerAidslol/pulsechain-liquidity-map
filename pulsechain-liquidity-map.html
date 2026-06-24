@@ -147,6 +147,8 @@ header{border-bottom:1px solid var(--border);padding:12px 20px;display:flex;alig
 </div>
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+
 // ── Config ────────────────────────────────────────────────────────────────────
 var LLAMA_PROTOS  = 'https://api.llama.fi/protocols';
 var LLAMA_YIELDS  = 'https://yields.llama.fi/pools';
@@ -182,7 +184,11 @@ var minTVL    = 0;
 var hoveredB  = null;
 var animFrame = null;
 var simSteps  = 0;
-var canvas, ctx, W, H;
+var canvas = document.getElementById('bubble-canvas');
+var ctx = canvas ? canvas.getContext('2d') : null;
+var W = canvas ? (canvas.parentElement ? canvas.parentElement.clientWidth : 800) : 800;
+var H = canvas ? (canvas.parentElement ? canvas.parentElement.clientHeight : 600) : 600;
+if(canvas && W > 0) { canvas.width = W; canvas.height = H; }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function showErr(msg) {
@@ -772,14 +778,14 @@ resize();
 updateLegend();
 
 // ── Simple init ──────────────────────────────────────────────────────────────
-canvas = document.getElementById('bubble-canvas');
-ctx = canvas ? canvas.getContext('2d') : null;
 resize();
 document.getElementById('loading').style.display='flex';
 setProgress(2,'Initialising...','');
 // Wait for paint then load
 setTimeout(function(){ loadData(false); }, 80);
 setInterval(function(){ loadData(false); }, 120000);
+
+});
 </script>
 </body>
 </html>
